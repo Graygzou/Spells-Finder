@@ -3,7 +3,6 @@ var url = "mongodb://localhost:27017/"
 MongoClient.connect(url,function(err,db) {
     if (err) throw err;
     console.log("Created");
-
     var dbo = db.db("BDR");
 
     dbo.createCollection("Pages", function(err,res){
@@ -13,10 +12,10 @@ MongoClient.connect(url,function(err,db) {
     //var collection = db.collection('SSSP');
 
     var graph = [
-        {_id:"PageA", value: {pagerank:1, outlink_list:["B","C"]} },
-        {_id:"PageB", value: {pagerank:1, outlink_list:["C"]} },
-        {_id:"PageC", value: {pagerank:1, outlink_list:["A"]} },
-        {_id:"PageD", value: {pagerank:1, outlink_list:["C"]} }
+        {_id:"A", value: {pagerank:1, outlink_list:["B","C"]} },
+        {_id:"B", value: {pagerank:1, outlink_list:["C"]} },
+        {_id:"C", value: {pagerank:1, outlink_list:["A"]} },
+        {_id:"D", value: {pagerank:1, outlink_list:["C"]} }
     ];
 
     dbo.collection("Pages").removeMany();
@@ -25,50 +24,59 @@ MongoClient.connect(url,function(err,db) {
         console.log("Number of nodes : " + res.insertedCount)
     });/*.then(function(result){})*/
 
-    //pageRank(20);
-    console.log("End");
-    db.close;
-
+    
     var map = function() {
         var page = this._id;
-        var pagerank = this.pagerank;
-        var outlink_list = this.outlink_list;
+        var pagerank = this.value.pagerank;
+        var outlink_list = this.value.outlink_list;
 
         for (var i=0, len=outlink_list.length; i<len; i++){
             var outlink = outlink_list[i];
-            emit(outlink,pagerank/size(outlink_list));
+            emit(outlink,pagerank/outlink_list.length);
         }
-        emit(page,outlink_list);
-        console.log("End Map");
+        //emit(page,this.value);
     };
 
-    var reduce = function(){
-        var page = this._id;
+    var reduce = function(page,values){
+        //print("Reduce, key : " + page + " , values : "+ values);
+        //var page = this._id;
         // var list = [];
         var outlink_list = [];
         var pagerank = 0;
         var damping = 0.85;
-
-        for (var i=0, len=list.length; i<len; i++){
-            var list_item = list[i];
-            if (isArray(list_item)) 
-                outlink_list=list_item;
+        
+        for (var i=0, len=values.length; i<len; i++){
+            //var list_item = values[i];
+            if (values[i] instanceof Array) 
+                outlink_list=values[i];
             else 
-                pagerank += list_item;
+                pagerank += values[i];
         }
-
         pagerank = 1 - damping + ( damping*pagerank )
-        emit(page,outlink_list);
-        console.log("End Reduce");
+        emit(page,pagerank);
     };
 
 
     function pageRank(max) {
         for (var j=0, nb=max; j<nb ; j++) {
             console.log("Iteration n° " + j);
-            dbo.collection("Pages").mapReduce(map,reduce, {out: {replace: "BDR"}});
+            dbo.collection("Pages").mapReduce(map,reduce, {out: "mapReduce"}, function(err,fin) {
+                if (err) throw err
+            });
         }
+        console.log("End");
+        db.close;
     }
+
+    pageRank(20);
+
+
+    /*dbo.collection("Pages").mapReduce(map,reduce, {out: "map reduce page rank"}, function(err,fin) {
+        if (err) throw err
+        console.log("End");
+        db.close;
+    });*/
+    
 
 
 
