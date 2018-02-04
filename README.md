@@ -5,3 +5,4 @@ The main objective is to use the MapReduce algorithm on a databse (containing sp
 
 # Contributors
 * [Grégoire Boiron](https://github.com/Graygzou)
+* [Théo Le Donné](https://github.com/Theo-Le-Donne)
