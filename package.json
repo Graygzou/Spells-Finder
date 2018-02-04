@@ -1,0 +1,10 @@
+{
+			"name": "Spells-Finder",
+			"version": "0.1.0",
+			"dependencies": {
+						"crawler-js": "^2.0.1",
+						"express": "~4.16.2"
+			},
+			"author": "Grégoire Boiron <gregoire.boiron@gmail.com>",
+			"description": "node.js application to find spells to play dungeons and dragons like games."
+}
