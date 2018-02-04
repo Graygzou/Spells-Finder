@@ -45,7 +45,7 @@
 		<section class="center-section">
 			<h1>Trouvez le sort qui vous correspond ! </h1>
 		
-			<a class="waves-effect waves-light btn-large"><i class="material-icons right">send</i>Démarrer</a>
+			<a class="waves-effect waves-light btn-large" id="next"><i class="material-icons right">send</i>Démarrer</a>
 		
 		</section>
 		
@@ -139,11 +139,26 @@
             </div>
           </div>
         </footer>
-	
-	
+		
       <!--Import jQuery before materialize.js-->
       <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-    </body>
+		<script>
+            var socket = io.connect('http://localhost:8080');
+			
+			// Ask the user nickname
+            /*var pseudo = prompt('Quel est votre pseudo ?');
+            // Send it zith the tag "petit_nouveau" (unlike the "message" tag)
+            socket.emit('petit_nouveau', pseudo);
+			
+            socket.on('message', function(message) {
+                alert('Le serveur a un message pour vous : ' + message['content']);
+            })*/
+
+            $('#next').click(function () {
+                socket.emit('get', 'http://google.com');
+            })
+        </script>
+	</body>
   </html>
         

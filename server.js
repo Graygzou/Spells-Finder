@@ -9,13 +9,30 @@ var http = require('http');
 var fs = require('fs');
 
 // Get our modules
-var module = require('./public/js/parser');
+//var module = require('./public/js/parser');
 
 // Initialize app object.
 var app = express();
 
 // Set path to views.
 //app.set('views', './views');
+
+var spells = new Crawler({	
+    maxConnections : 10,
+    // This will be called for each crawled page
+    callback : function (error, res, done) {
+        if(error){
+            console.log(error);
+        }else{
+            var $ = res.$;
+            // $ is Cheerio by default
+            //a lean implementation of core jQuery designed specifically for the server
+            console.log(res.body)
+            console.log($("title").text());
+        }
+        done();
+    }
+});
 
 // Let express know there's a public directory.
 app.use(express.static('./public'));
@@ -31,7 +48,6 @@ app.get('/', function(req, res) {
         res.writeHead(200, {"Content-Type": "text/html"});
         res.end(content);
     });
-	crawlerjs(module('http://www.tibia.com/community/?subtopic=worlds'));
 });
 
 app.get('/Exercice1', function(req, res) {
