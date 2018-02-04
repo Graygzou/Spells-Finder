@@ -3,9 +3,13 @@
  * @version : 0.1.0
  */
 
+var Crawler = require('crawler');
 var express = require('express');
 var http = require('http');
 var fs = require('fs');
+
+// Get our modules
+var module = require('./public/js/parser');
 
 // Initialize app object.
 var app = express();
@@ -27,6 +31,7 @@ app.get('/', function(req, res) {
         res.writeHead(200, {"Content-Type": "text/html"});
         res.end(content);
     });
+	crawlerjs(module('http://www.tibia.com/community/?subtopic=worlds'));
 });
 
 app.get('/Exercice1', function(req, res) {

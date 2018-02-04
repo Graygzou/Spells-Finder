@@ -2,7 +2,7 @@
 			"name": "Spells-Finder",
 			"version": "0.1.0",
 			"dependencies": {
-						"crawler-js": "^2.0.1",
+						"crawler": "^1.1.2",
 						"express": "~4.16.2"
 			},
 			"author": "Grégoire Boiron <gregoire.boiron@gmail.com>",
