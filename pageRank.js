@@ -62,6 +62,7 @@ MongoClient.connect(url,function(err,db) {
             console.log("Iteration n° " + j);
             dbo.collection("Pages").mapReduce(map,reduce, {out: "mapReduce"}, function(err,fin) {
                 if (err) throw err
+                console.log(dbo.listCollections());
             });
         }
         console.log("End");
