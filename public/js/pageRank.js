@@ -8,68 +8,103 @@ MongoClient.connect(url,function(err,db) {
     dbo.createCollection("Pages", function(err,res){
         if (err) throw err;
         console.log("Collection created");
+        var graph = [
+            {_id:"A", value: {pagerank:1, outlink_list:["A","B","C"]} },
+            {_id:"B", value: {pagerank:1, outlink_list:["B","C"]} },
+            {_id:"C", value: {pagerank:1, outlink_list:["C","A"]} },
+            {_id:"D", value: {pagerank:1, outlink_list:["D","C"]} }
+        ];
+    
+        dbo.collection("Pages").removeMany();
+        dbo.collection("Pages").insertMany(graph, function(err,res){
+            if (err) throw err;
+            console.log("Number of nodes : " + res.insertedCount)
+
+
+            var map = function() {
+                print("-----Map-----");
+                var page = this._id;
+                var pagerank = this.value.pagerank;
+                var outlink_list = this.value.outlink_list;
+        
+                emit(page,this.value);
+
+                for (var i=0, len=outlink_list.length; i<len; i++){
+                    var outlink = outlink_list[i];
+                    //var obj = {pagerank:1, outlink_list:["C"]};
+                    print("outlink", tojson(outlink))
+                    print("pagerank", tojson(pagerank/outlink_list.length));
+                    var objet = {pagerank:pagerank/outlink_list.length}
+                    emit(outlink,objet);
+                }
+
+            };
+        
+            var reduce = function(page,values){
+                print("-----Reduce-----");
+                print("key : " , tojson(page));
+                print("values : ", tojson(values));
+                //var page = this._id;
+                // var list = [];
+                var outlink_list = [];
+                var pagerank = 0;
+                var damping = 0.85;
+                var obj = {};
+                
+                for (var i=0, len=values.length; i<len; i++){
+                    //var list_item = values[i];
+                    print("values[i] : ", values[i]);
+                    if (values[i] instanceof Array) {
+                        print("Array ");
+                        outlink_list=values[i];}
+                    else {
+                        print("Not Array ");
+                        pagerank += values[i];
+                    }
+                }
+                pagerank = 1 - damping + ( damping*pagerank );
+                print("pagerank : " , pagerank);
+                obj = {}
+                return pagerank;
+
+            };
+        
+        
+            function pageRank(max) {
+                for (var j=0, nb=max; j<nb ; j++) {
+                    console.log("Iteration n° " + j);
+                    dbo.collection("Pages").mapReduce(map,reduce, {out: "mapReduce"}, function(err,fin) {
+                        if (err) throw err
+                        fin.findOne({"_id" : "A"}, function(err, result){
+                            console.log(result);
+                        });
+                        fin.findOne({"_id" : "B"}, function(err, result){
+                            console.log(result);
+                        });
+                        fin.findOne({"_id" : "C"}, function(err, result){
+                            console.log(result);
+                        });
+                        fin.findOne({"_id" : "D"}, function(err, result){
+                            console.log(result);
+                        });
+                        
+                    });
+                }
+                console.log("End");
+                db.close;
+        
+                
+            }
+        
+            pageRank(2);
+        });/*.then(function(result){})*/
+    
+        
+        
     })
     //var collection = db.collection('SSSP');
 
-    var graph = [
-        {_id:"A", value: {pagerank:1, outlink_list:["B","C"]} },
-        {_id:"B", value: {pagerank:1, outlink_list:["C"]} },
-        {_id:"C", value: {pagerank:1, outlink_list:["A"]} },
-        {_id:"D", value: {pagerank:1, outlink_list:["C"]} }
-    ];
-
-    dbo.collection("Pages").removeMany();
-    dbo.collection("Pages").insertMany(graph, function(err,res){
-        if (err) throw err;
-        console.log("Number of nodes : " + res.insertedCount)
-    });/*.then(function(result){})*/
-
     
-    var map = function() {
-        var page = this._id;
-        var pagerank = this.value.pagerank;
-        var outlink_list = this.value.outlink_list;
-
-        for (var i=0, len=outlink_list.length; i<len; i++){
-            var outlink = outlink_list[i];
-            emit(outlink,pagerank/outlink_list.length);
-        }
-        //emit(page,this.value);
-    };
-
-    var reduce = function(page,values){
-        //print("Reduce, key : " + page + " , values : "+ values);
-        //var page = this._id;
-        // var list = [];
-        var outlink_list = [];
-        var pagerank = 0;
-        var damping = 0.85;
-        
-        for (var i=0, len=values.length; i<len; i++){
-            //var list_item = values[i];
-            if (values[i] instanceof Array) 
-                outlink_list=values[i];
-            else 
-                pagerank += values[i];
-        }
-        pagerank = 1 - damping + ( damping*pagerank )
-        emit(page,pagerank);
-    };
-
-
-    function pageRank(max) {
-        for (var j=0, nb=max; j<nb ; j++) {
-            console.log("Iteration n° " + j);
-            dbo.collection("Pages").mapReduce(map,reduce, {out: "mapReduce"}, function(err,fin) {
-                if (err) throw err
-                console.log(dbo.listCollections());
-            });
-        }
-        console.log("End");
-        db.close;
-    }
-
-    pageRank(20);
 
 
     /*dbo.collection("Pages").mapReduce(map,reduce, {out: "map reduce page rank"}, function(err,fin) {
