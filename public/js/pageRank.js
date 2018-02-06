@@ -20,22 +20,22 @@ MongoClient.connect(url,function(err,db) {
             if (err) throw err;
             console.log("Number of nodes : " + res.insertedCount)
 
-
             var map = function() {
                 print("-----Map-----");
                 var page = this._id;
                 var pagerank = this.value.pagerank;
                 var outlink_list = this.value.outlink_list;
         
-                emit(page,this.value);
+                emit(page,outlink_list);
 
                 for (var i=0, len=outlink_list.length; i<len; i++){
                     var outlink = outlink_list[i];
                     //var obj = {pagerank:1, outlink_list:["C"]};
                     print("outlink", tojson(outlink))
                     print("pagerank", tojson(pagerank/outlink_list.length));
-                    var objet = {pagerank:pagerank/outlink_list.length}
-                    emit(outlink,objet);
+                    emit(outlink,pagerank/outlink_list.length);
+                    //var objet = {pagerank:pagerank/outlink_list.length, outlink_list: outlink_list};
+                    //emit(outlink,objet);
                 }
 
             };
@@ -63,9 +63,9 @@ MongoClient.connect(url,function(err,db) {
                     }
                 }
                 pagerank = 1 - damping + ( damping*pagerank );
-                print("pagerank : " , pagerank);
-                obj = {}
-                return pagerank;
+                obj = {pagerank:pagerank, outlink_list: outlink_list}
+                print("obj : " , tojson(obj));
+                return obj;
 
             };
         
@@ -73,7 +73,7 @@ MongoClient.connect(url,function(err,db) {
             function pageRank(max) {
                 for (var j=0, nb=max; j<nb ; j++) {
                     console.log("Iteration n° " + j);
-                    dbo.collection("Pages").mapReduce(map,reduce, {out: "mapReduce"}, function(err,fin) {
+                    dbo.collection("Pages").mapReduce(map,reduce, {out: {replace: "Pages"}}, function(err,fin) {
                         if (err) throw err
                         fin.findOne({"_id" : "A"}, function(err, result){
                             console.log(result);
@@ -95,13 +95,46 @@ MongoClient.connect(url,function(err,db) {
         
                 
             }
+
+            function pageR(i, max, end){
+                dbo.collection("Pages").mapReduce(map,reduce, {out: {replace: "Pages"}}, function(err,fin) {
+                    if (err) throw err
+                    if (i==max) end();
+                    
+                    else {
+                        console.log("  ");
+                        console.log("  ");
+                        console.log("Iteration n° " + i);
+                        fin.findOne({"_id" : "A"}, function(err, result){
+                            console.log(result);
+                        });
+                        fin.findOne({"_id" : "B"}, function(err, result){
+                            console.log(result);
+                        });
+                        fin.findOne({"_id" : "C"}, function(err, result){
+                            console.log(result);
+                        });
+                        fin.findOne({"_id" : "D"}, function(err, result){
+                            console.log(result);
+                        });
+                        console.log("  ");
+                        pageR(i+1,max,end);
+                    }
+                });
+
+            }
         
-            pageRank(2);
-        });/*.then(function(result){})*/
+            //pageRank(10);
+            pageR(1,22,function end() {
+                console.log("End");
+                db.close;
+            })
+
+        }); //InsertMany
     
-        
-        
-    })
+    });//createCOllection
+
+
     //var collection = db.collection('SSSP');
 
     
