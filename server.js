@@ -28,8 +28,10 @@ app.get('/', function(req, res) {
 	fs.readFile('./views/index.html', 'utf-8', function(error, content) {
         res.writeHead(200, {"Content-Type": "text/html"});
         res.end(content);
-		
-		moncrawler.crawlerPage("http://www.d20pfsrd.com/magic/all-spells/a/acid-arrow");
+
+		var id = 1;
+		//TODO Loop de 1 à *regarder sur le sujet xD*
+		moncrawler.crawlerPage("http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID="+id);
     });
 });
 
