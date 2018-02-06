@@ -1,11 +1,22 @@
 {
-			"name": "Spells-Finder",
-			"version": "0.1.0",
-			"dependencies": {
-						"crawler": "^1.1.2",
-						"express": "~4.16.2",
-						"socket.io": "^2.0.4"
-			},
-			"author": "Grégoire Boiron <gregoire.boiron@gmail.com>",
-			"description": "node.js application to find spells to play dungeons and dragons like games."
+	"name": "Spells-Finder",
+	"version": "0.1.0",
+	"description": "Project made for class Distributed Databases (8INF803) at UQAC",
+	"main": "server.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Grégoire Boiron <gregoire.boiron@gmail.com>",
+	"contributors": [
+		"Florian Vidal",
+		"Théo Le Donné",
+		"Théo Debay"
+	],
+	"license": "ISC",
+	"dependencies": {
+		"crawler": "^1.1.2",
+		"express": "~4.16.2",
+		"mongodb": "^3.0.2",
+		"socket.io": "^2.0.4"
+	}
 }
