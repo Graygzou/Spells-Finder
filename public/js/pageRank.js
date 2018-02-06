@@ -25,7 +25,13 @@ MongoClient.connect(url,function(err,db) {
                 var page = this._id;
                 var pagerank = this.value.pagerank;
                 var outlink_list = this.value.outlink_list;
-        
+
+                print("Page", page);
+                print("Pagerank", pagerank);
+                print("List", outlink_list);
+
+                //var value = {pagerank:pagerank, outlink_list: outlink_list}
+                //emit(page,value);
                 emit(page,outlink_list);
 
                 for (var i=0, len=outlink_list.length; i<len; i++){
@@ -68,35 +74,8 @@ MongoClient.connect(url,function(err,db) {
                 return obj;
 
             };
-        
-        
-            function pageRank(max) {
-                for (var j=0, nb=max; j<nb ; j++) {
-                    console.log("Iteration n° " + j);
-                    dbo.collection("Pages").mapReduce(map,reduce, {out: {replace: "Pages"}}, function(err,fin) {
-                        if (err) throw err
-                        fin.findOne({"_id" : "A"}, function(err, result){
-                            console.log(result);
-                        });
-                        fin.findOne({"_id" : "B"}, function(err, result){
-                            console.log(result);
-                        });
-                        fin.findOne({"_id" : "C"}, function(err, result){
-                            console.log(result);
-                        });
-                        fin.findOne({"_id" : "D"}, function(err, result){
-                            console.log(result);
-                        });
-                        
-                    });
-                }
-                console.log("End");
-                db.close;
-        
-                
-            }
 
-            function pageR(i, max, end){
+            function pageRank(i, max, end){
                 dbo.collection("Pages").mapReduce(map,reduce, {out: {replace: "Pages"}}, function(err,fin) {
                     if (err) throw err
                     if (i==max) end();
@@ -118,21 +97,23 @@ MongoClient.connect(url,function(err,db) {
                             console.log(result);
                         });
                         console.log("  ");
-                        pageR(i+1,max,end);
+                        pageRank(i+1,max,end);
                     }
                 });
 
             }
         
             //pageRank(10);
-            pageR(1,22,function end() {
+            pageRank(1,21,function end() {
                 console.log("End");
                 db.close;
-            })
+            });
 
-        }); //InsertMany
+        });//insertMany
     
-    });//createCOllection
+    });//createCollection
+
+});//connect
 
 
     //var collection = db.collection('SSSP');
@@ -145,13 +126,29 @@ MongoClient.connect(url,function(err,db) {
         console.log("End");
         db.close;
     });*/
+
+
+    /*function pageRank(max) {
+                for (var j=0, nb=max; j<nb ; j++) {
+                    console.log("Iteration n° " + j);
+                    dbo.collection("Pages").mapReduce(map,reduce, {out: {replace: "Pages"}}, function(err,fin) {
+                        if (err) throw err
+                        fin.findOne({"_id" : "A"}, function(err, result){
+                            console.log(result);
+                        });
+                        fin.findOne({"_id" : "B"}, function(err, result){
+                            console.log(result);
+                        });
+                        fin.findOne({"_id" : "C"}, function(err, result){
+                            console.log(result);
+                        });
+                        fin.findOne({"_id" : "D"}, function(err, result){
+                            console.log(result);
+                        });
+                        
+                    });
+                }
+                console.log("End");
+                db.close;
+            }*/
     
-
-
-
-
-
-
-
-    
-})
