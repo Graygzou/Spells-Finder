@@ -26,3 +26,5 @@ The following list is all the node.js modules we installed to make our applicati
 # Contributors
 * [Grégoire Boiron](https://github.com/Graygzou)
 * [Théo Le Donné](https://github.com/Theo-Le-Donne)
+* [Florian Vidal](https://github.com/FlorianVidal66)
+* [Théo Debay]
