@@ -2,7 +2,11 @@
  * @author : Grégoire Boiron <gregoire.boiron@gmail.com>
  * @version : 0.1.0
  */
-
+ 
+// -------------------------------------
+// Import modules
+// -------------------------------------
+ 
 var http = require('http');
 var fs = require('fs');
 var express = require('express'),
@@ -12,11 +16,35 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server);  //pass a http.Server instance
 server.listen(8080);  //listen on port 80
 
+// Import database packages
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+
 // Get our modules
 var moncrawler = require('./crawlerModule');
 
+// -------------------------------------
+// Basic configuration
+// -------------------------------------
+
 // Let express know there's a public directory.
 app.use(express.static('./public'));
+
+// Connection URL
+const url = 'mongodb://localhost:27017';
+ 
+// Database Name
+const dbName = 'mongodbSpellsFinder';
+ 
+// Use connect method to connect to the server
+MongoClient.connect(url, function(err, client) {
+  assert.equal(null, err);
+  console.log("Connected successfully to bdd");
+ 
+  const db = client.db(dbName);
+ 
+  client.close();
+});
 
 // -------------------------------------
 // Basic Routing
