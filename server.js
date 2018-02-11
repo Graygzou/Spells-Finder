@@ -16,15 +16,15 @@ var server = http.createServer(app);
 var io = require('socket.io').listen(server);  //pass a http.Server instance
 server.listen(8080);  //listen on port 80
 
-// Get our modules
-var moncrawler = require('./crawlerModule');
-
 // -------------------------------------
 // Basic configuration
 // -------------------------------------
 
 // Let express know there's a public directory.
-app.use(express.static('./public'));
+app.use(express.static(__dirname + 'public'));
+
+// Get our custom modules
+var moncrawler = require('./public/js/crawlerModule');
 
 // -------------------------------------
 // Basic Routing
@@ -74,6 +74,5 @@ io.sockets.on('connection', function (socket) {
     socket.on('get', function (message) {
         console.log('Un client me parle ! Il me dit : ' + message);
 		c.queue(message);
-		
     });	
 });

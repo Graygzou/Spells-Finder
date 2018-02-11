@@ -121,9 +121,5 @@ var crawlerPage = function(url) {
 	crawler.queue(url);
 }
 
-
-
-
-
-// Export the function of the module
+// Export module functions
 exports.crawlerPage = crawlerPage;

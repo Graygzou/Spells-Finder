@@ -1,9 +1,12 @@
 /**
- * @author : Theo Le Donne 
+ * @author : Theo Le Donne
+ *			 Gregoire Boiron <gregoire.boiron@gmail.com>
  * 
  * Execute "mongod" in a terminal then "node pageRank.js" in another terminal
  */
 
+// Get the mapReduceModule
+var mapReduce = require('./public/js/mapReduceModule');
 
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/"
@@ -28,58 +31,8 @@ MongoClient.connect(url,function(err,db) {
             if (err) throw err;
             console.log("Number of nodes : " + res.insertedCount)
 
-            var map = function() {
-                var page = this._id;
-                var pagerank = this.value.pagerank;
-                var outlink_list = this.value.outlink_list;
-                var linkPageRank = 0;
-
-                /*print("-----Map-----");
-                print("Page", page);
-                print("Pagerank", pagerank);
-                print("List", outlink_list);*/
-
-                emit(page,outlink_list);
-
-                for (var i=0, len=outlink_list.length; i<len; i++){
-                    var outlink = outlink_list[i];
-                    if (page!==outlink) var linkPageRank = pagerank/(outlink_list.length-1); //the default pageRank for the node itself is set to 0
-                    //print("outlink", tojson(outlink))
-                    //print("pagerank", tojson(linkPageRank));
-                    emit(outlink,linkPageRank);
-
-                }
-
-            };
-        
-            var reduce = function(page,values){
-                /*print("-----Reduce-----");
-                print("key : " , tojson(page));
-                print("values : ", tojson(values));*/
-
-                var outlink_list = [];
-                var pagerankSum = 0;
-                var damping = 0.85;
-                var nbOfNodes = this.insertedCount;
-                var obj = {};
-                
-                for (var i=0, len=values.length; i<len; i++){
-                    //print("values[i] : ", values[i]);
-                    if (values[i] instanceof Array) {
-                        outlink_list=values[i];}
-                    else {                        
-                        pagerankSum += values[i];
-                    }
-                }
-                var newPageRank = 1 - damping + ( damping*pagerankSum );
-                obj = {pagerank:newPageRank, outlink_list: outlink_list}
-                //print("obj : " , tojson(obj));
-                return obj;
-
-            };
-
             function pageRank(i, max, end){
-                dbo.collection("Pages").mapReduce(map,reduce, {out: {replace: "Pages"}}, function(err,fin) {
+                dbo.collection("Pages").mapReduce(mapReduce.map, mapReduce.reduce, {out: {replace: "Pages"}}, function(err,fin) {
                     if (err) throw err
                     if (i==max) end();
                     
