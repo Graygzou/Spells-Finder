@@ -8,11 +8,24 @@
 var Crawler = require('crawler');
 var fs = require('fs');
 
+// Import database packages
+const MongoClient = require('mongodb').MongoClient;
+const assert = require('assert');
+
+// Connection URL
+const dbUrl = 'mongodb://localhost:27017/';
+ 
+// Database Name
+const dbName = 'mongodbSpellsFinder';
+
+// Collection name
+const collecName = 'spells';
+
 // Function that get the page and return Cheerio to crawl the HTML body
 var crawlerPage = function(url) {
     console.log('URl : ' + url);
 	var crawler = new Crawler({
-		rateLimit: 100000000, // `maxConnections` will be forced to 1
+		maxConnections: 1, // `maxConnections` will be forced to 1
 		// This will be called for each crawled page
 		callback : function (error, res, done) {
 			if(error) {
@@ -40,6 +53,7 @@ var crawlerPage = function(url) {
 
                 var description = $($('div.SpellDiv').children()[11]).text();
 
+				/*
                 console.log("School           : " + school);
                 console.log("Level            : " + level);
                 console.log("Casting Time     : " + castingTime);
@@ -49,8 +63,43 @@ var crawlerPage = function(url) {
                 console.log("Duration         : " + duration);
                 console.log("Saving Throw     : " + savingThrow);
                 console.log("Spell Resistance : " + spellResistance);
-                console.log("Description      : " + description);
+                console.log("Description      : " + description);*/
+				
+				var currentSpell = { 
+					"School": school, "Level": level, "Casting Time": castingTime,
+					"Components": components, Range: range, "Effects": effects,
+					"Duration": duration, "Saving Throw": savingThrow,
+					"Spell Resistance": spellResistance, "Description": description
+				};
+				
+				// Use connect method to connect to the server
+				MongoClient.connect(dbUrl, function(err, db) {
+					assert.equal(null, err);
+					console.log("Connected successfully to bdd");
 
+					// Create a database
+					var spellsFinderDb = db.db(dbName);
+					
+					// Create a test collection
+					spellsFinderDb.createCollection(collecName, function(err, res) {
+						if (err) throw err;
+						console.log("Collection created!");
+					});
+
+					// Insert the current value in the database
+					spellsFinderDb.collection(collecName).insertOne(currentSpell, function(err, res) {
+						if (err) throw err;
+						console.log("1 document inserted");
+					});
+					
+					spellsFinderDb.collection(collecName).findOne({}, function(err, result) {
+						if (err) throw err;
+						console.log(result);
+						db.close();
+					});
+				 
+				  //db.close();
+				});
 
 				// $ is Cheerio by default
 				//a lean implementation of core jQuery designed specifically for the server
