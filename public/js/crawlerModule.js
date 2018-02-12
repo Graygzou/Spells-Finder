@@ -12,6 +12,9 @@ var fs = require('fs');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
+// Import custom modules
+var parserModule = require('./parser');
+
 // Connection URL
 const dbUrl = 'mongodb://localhost:27017/';
  
@@ -53,8 +56,9 @@ var crawlerPage = function(url) {
 
                 var description = $($('div.SpellDiv').children()[11]).text();
 
+				
+                console.log(parserModule.splitSchool(school));
 				/*
-                console.log("School           : " + school);
                 console.log("Level            : " + level);
                 console.log("Casting Time     : " + castingTime);
                 console.log("Components       : " + components);
@@ -65,7 +69,7 @@ var crawlerPage = function(url) {
                 console.log("Spell Resistance : " + spellResistance);
                 console.log("Description      : " + description);*/
 				
-				var currentSpell = { 
+				var currentSpell = {
 					"School": school, "Level": level, "Casting Time": castingTime,
 					"Components": components, Range: range, "Effects": effects,
 					"Duration": duration, "Saving Throw": savingThrow,
@@ -95,7 +99,6 @@ var crawlerPage = function(url) {
 					spellsFinderDb.collection(collecName).findOne({}, function(err, result) {
 						if (err) throw err;
 						console.log(result);
-						db.close();
 					});
 				 
 				  //db.close();

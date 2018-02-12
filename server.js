@@ -36,10 +36,6 @@ app.get('/', function(req, res) {
 	fs.readFile('./views/index.html', 'utf-8', function(error, content) {
         res.writeHead(200, {"Content-Type": "text/html"});
         res.end(content);
-
-		var id = 1;
-		//TODO Loop de 1 à *regarder sur le sujet xD*
-		moncrawler.crawlerPage("http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID="+id);
     });
 });
 
@@ -73,6 +69,9 @@ io.sockets.on('connection', function (socket) {
     // On "get" message from the client    
     socket.on('get', function (message) {
         console.log('Un client me parle ! Il me dit : ' + message);
-		c.queue(message);
+		
+		var id = 1;
+		//TODO Loop de 1 à *regarder sur le sujet xD*
+		moncrawler.crawlerPage("http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID="+id);
     });	
 });
