@@ -53,6 +53,13 @@ function splitComponent(components) {
 	return componentsJSON
 }
 
+function splitRange(range) {
+	var rangeJSON = {};
+	var rangeArray = range.split(' ');
+	rangeJSON["range"] = rangeArray[0];
+	return rangeJSON;
+}
+
 /**
  * TODO later
  */
@@ -74,6 +81,7 @@ function splitComponents(components) {
 exports.splitSchool = splitSchool;
 exports.splitLevel = splitLevel;
 exports.splitComponent = splitComponent;
+exports.splitRange = splitRange;
 
 // ---------------------------------------------------------------
 // PRIVATE FUNCTIONS

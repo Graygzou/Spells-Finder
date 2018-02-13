@@ -60,7 +60,7 @@ var crawlerPage = function(url) {
 				console.log(parserModule.splitSchool(school));
 				console.log(parserModule.splitLevel(level));
 				console.log(parserModule.splitComponent(components));
-				
+				console.log(parserModule.splitRange(range));
 
 				
                 console.log("Level            : " + level);
