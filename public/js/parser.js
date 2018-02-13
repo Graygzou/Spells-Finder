@@ -16,7 +16,7 @@ function splitSchool(school) {
 		// Retrieve the descriptor
 		var descriptor = splitContainer(school, '[', ']', '');
 		// Merge the final result
-		schoolJSON = jsonConcat(schoolJSON, [
+		schoolJSON = JSONConcat(schoolJSON, [
 			{"subschool": subschool}, 
 			{"descriptor": descriptor}
 		]);
@@ -27,12 +27,14 @@ function splitSchool(school) {
 function splitLevel(level) {
 	levelJSON = {};
 	var levelsArray = level.split(', ');
-	var json = {};
+	tab = [];
 	for (var i = 0, len = levelsArray.length; i<len;i++ ) {
 		var id = levelsArray[i].split(' ');
+		var json = {};
 		json[id[0]] = id[1];
+		tab[i] = json;
 	}
-	levelJSON["level"] = json;
+	levelJSON["level"] = tab;
 	return levelJSON;
 }
 
@@ -77,11 +79,20 @@ function splitComponents(components) {
 	return arr
 }*/
 
-// Export module functions
-exports.splitSchool = splitSchool;
-exports.splitLevel = splitLevel;
-exports.splitComponent = splitComponent;
-exports.splitRange = splitRange;
+/**
+ * Allow to merge properties of many JSON objects into one.
+ * @param {object} mainValue - JSON object that will contains all the properties.
+ * @param {array<object>} properties - JSON objects with properties.
+ */
+function JSONConcat(mainValue, properties) {
+	// For each subcategorie we want to add.
+	properties.forEach(function(elem) {
+		for (var key in elem) {
+			mainValue[key] = elem[key];
+		}
+	});
+	return mainValue;
+}
 
 // ---------------------------------------------------------------
 // PRIVATE FUNCTIONS
@@ -104,15 +115,10 @@ function splitContainer(line, leftContainer, rightContainer, regexp) {
 	return objects;
 }
 
-/**
- *
- */
-function jsonConcat(mainValue, properties) {
-	// For each subcategorie we want to add.
-	properties.forEach(function(elem) {
-		for (var key in elem) {
-			mainValue[key] = elem[key];
-		}
-	});
-	return mainValue;
-}
+// Export module functions
+exports.splitSchool = splitSchool;
+exports.splitLevel = splitLevel;
+exports.splitComponent = splitComponent;
+exports.splitRange = splitRange;
+
+exports.JSONConcat = JSONConcat;

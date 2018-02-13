@@ -115,7 +115,9 @@ var getSpecificSpell = function(maxLevel, isVerbose, isSomatic, provideResistanc
 }
 
 
-// Function that close the db
+/**
+ * Function that close the current database
+ */
 var closeSpellsdb = function() {
 	db.close((err) => {
 		if (err) {

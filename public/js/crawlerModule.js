@@ -40,13 +40,13 @@ var crawlerPage = function(url) {
 				var title = $('div.heading').find('p').text();
 
                 var infoSchoolLevel = $($('div.SpellDiv').children()[1]).text();
-                var school = infoSchoolLevel.substring(7,infoSchoolLevel.indexOf(";"));
-                var level = infoSchoolLevel.substring(infoSchoolLevel.indexOf(";")+8, infoSchoolLevel.length);
+                var school = parserModule.splitSchool(infoSchoolLevel.substring(7,infoSchoolLevel.indexOf(";")));
+                var level = parserModule.splitLevel(infoSchoolLevel.substring(infoSchoolLevel.indexOf(";")+8, infoSchoolLevel.length));
 
                 var castingTime = $($('div.SpellDiv').children()[3]).text().substring(13);
-                var components = $($('div.SpellDiv').children()[4]).text().substring(11);
+                var components = parserModule.splitComponent($($('div.SpellDiv').children()[4]).text().substring(11));
 
-                var range = $($('div.SpellDiv').children()[6]).text().substring(6);
+                var range = parserModule.splitRange($($('div.SpellDiv').children()[6]).text().substring(6));
                 var effects = $($('div.SpellDiv').children()[7]).text().substring(7);
                 var duration = $($('div.SpellDiv').children()[8]).text().substring(9);
 
@@ -56,13 +56,14 @@ var crawlerPage = function(url) {
 
                 var description = $($('div.SpellDiv').children()[11]).text();
 
+				// 
+				console.log(school);
+				console.log(level);
+				console.log(components);
+				console.log(range);
+				console.log("SpellResistance :" + spellResistance);
 				
-				console.log(parserModule.splitSchool(school));
-				console.log(parserModule.splitLevel(level));
-				console.log(parserModule.splitComponent(components));
-				console.log(parserModule.splitRange(range));
-
-				
+				/*
                 console.log("Level            : " + level);
                 console.log("Casting Time     : " + castingTime);
                 console.log("Components       : " + components);
@@ -71,14 +72,12 @@ var crawlerPage = function(url) {
                 console.log("Duration         : " + duration);
                 console.log("Saving Throw     : " + savingThrow);
                 console.log("Spell Resistance : " + spellResistance);
-                console.log("Description      : " + description);
+                console.log("Description      : " + description);*/
 				
-				var currentSpell = {
-					"School": school, "Level": level, "Casting Time": castingTime,
-					"Components": components, Range: range, "Effects": effects,
-					"Duration": duration, "Saving Throw": savingThrow,
-					"Spell Resistance": spellResistance, "Description": description
-				};
+				var currentSpell = parserModule.JSONConcat(school, [level, components, range, {SpellResistance: spellResistance}])
+				
+				
+				console.log(currentSpell);
 				
 				// Use connect method to connect to the server
 				MongoClient.connect(dbUrl, function(err, db) {
