@@ -26,6 +26,8 @@ app.use(express.static(__dirname + 'public'));
 // Get our custom modules
 var moncrawler = require('./public/js/crawlerModule');
 
+var sqlite = require('./public/js/sqliteModule');
+
 // -------------------------------------
 // Basic Routing
 // -------------------------------------
@@ -34,6 +36,8 @@ var moncrawler = require('./public/js/crawlerModule');
 app.get('/', function(req, res) {
     res.setHeader('Content-Type', 'text/plain');
 	fs.readFile('./views/index.html', 'utf-8', function(error, content) {
+		sqlite.openSpellsdb();
+		sqlite.closeSpellsdb();
         res.writeHead(200, {"Content-Type": "text/html"});
         res.end(content);
     });
