@@ -57,8 +57,12 @@ var crawlerPage = function(url) {
                 var description = $($('div.SpellDiv').children()[11]).text();
 
 				
-                console.log(parserModule.splitSchool(school));
-				/*
+				console.log(parserModule.splitSchool(school));
+				console.log(parserModule.splitLevel(level));
+				console.log(parserModule.splitComponent(components));
+				
+
+				
                 console.log("Level            : " + level);
                 console.log("Casting Time     : " + castingTime);
                 console.log("Components       : " + components);
@@ -67,7 +71,7 @@ var crawlerPage = function(url) {
                 console.log("Duration         : " + duration);
                 console.log("Saving Throw     : " + savingThrow);
                 console.log("Spell Resistance : " + spellResistance);
-                console.log("Description      : " + description);*/
+                console.log("Description      : " + description);
 				
 				var currentSpell = {
 					"School": school, "Level": level, "Casting Time": castingTime,

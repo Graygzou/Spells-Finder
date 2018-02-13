@@ -1,5 +1,5 @@
 /**
- * @author : Grégoire Boiron <gregoire.boiron@gmail.com>
+ * @author : Grï¿½goire Boiron <gregoire.boiron@gmail.com>
  * @version : 0.1.0
  */
 
@@ -24,6 +24,35 @@ function splitSchool(school) {
 	return schoolJSON;
 }
 
+function splitLevel(level) {
+	levelJSON = {};
+	var levelsArray = level.split(', ');
+	var json = {};
+	for (var i = 0, len = levelsArray.length; i<len;i++ ) {
+		var id = levelsArray[i].split(' ');
+		json[id[0]] = id[1];
+	}
+	levelJSON["level"] = json;
+	return levelJSON;
+}
+
+function splitComponent(components) {
+	var componentsJSON = {};
+	var componentsArray = components.split(', ');
+	var tab = [];
+	for (var i = 0, len = componentsArray.length; i<len;i++ ) {
+		if (componentsArray[i].includes("M/DF")){
+			tab[i]="M/DF";
+		} else if (componentsArray[i].includes("DF")) {
+			tab[i]="DF";
+		} else {
+			tab[i]=componentsArray[i].charAt(0);
+		}
+	}
+	componentsJSON["components"] = tab;
+	return componentsJSON
+}
+
 /**
  * TODO later
  */
@@ -43,6 +72,8 @@ function splitComponents(components) {
 
 // Export module functions
 exports.splitSchool = splitSchool;
+exports.splitLevel = splitLevel;
+exports.splitComponent = splitComponent;
 
 // ---------------------------------------------------------------
 // PRIVATE FUNCTIONS
