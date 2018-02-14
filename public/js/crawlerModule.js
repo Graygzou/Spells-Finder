@@ -5,24 +5,19 @@
  */
 
 // import the specific package
-var Crawler = require('crawler');
-var fs = require('fs');
-
-// Import database packages
+const Crawler = require('crawler');
+const fs = require('fs');
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
 // Import custom modules
 var parserModule = require('./parser');
+var mapReduceModule = require('./mapReduceModule');
 
-// Connection URL
+// Database variables
 const dbUrl = 'mongodb://localhost:27017/';
- 
-// Database Name
-const dbName = 'mongodbSpellsFinder';
-
-// Collection name
-const collecName = 'spells';
+const dbName = 'mongodbSpellsFinder';		// Database Name
+const collecName = 'spells';				// Collection name
 
 // Function that get the page and return Cheerio to crawl the HTML body
 var crawlerPage = function(url) {
@@ -37,7 +32,7 @@ var crawlerPage = function(url) {
 				var $ = res.$;
 
 				// Parser
-				var title = $('div.heading').find('p').text();
+				var spellTitle = $('div.heading').find('p').text();
 
                 var infoSchoolLevel = $($('div.SpellDiv').children()[1]).text();
                 var school = parserModule.splitSchool(infoSchoolLevel.substring(7,infoSchoolLevel.indexOf(";")));
@@ -57,6 +52,7 @@ var crawlerPage = function(url) {
                 var description = $($('div.SpellDiv').children()[11]).text();
 
 				// 
+				console.log(spellTitle)
 				console.log(school);
 				console.log(level);
 				console.log(components);
@@ -74,9 +70,7 @@ var crawlerPage = function(url) {
                 console.log("Spell Resistance : " + spellResistance);
                 console.log("Description      : " + description);*/
 				
-				var currentSpell = parserModule.JSONConcat(school, [level, components, range, {SpellResistance: spellResistance}])
-				
-				
+				var currentSpell = parserModule.JSONConcat({name: spellTitle}, [school, level, components, range, {SpellResistance: spellResistance}])
 				console.log(currentSpell);
 				
 				// Use connect method to connect to the server
@@ -103,8 +97,12 @@ var crawlerPage = function(url) {
 						if (err) throw err;
 						console.log(result);
 					});
-				 
-				  //db.close();
+					
+					mapReduceModule.findSpells(0, 1, spellsFinderDb, function end() {
+						console.log("End");
+						db.close;
+					});
+					
 				});
 
 				// $ is Cheerio by default

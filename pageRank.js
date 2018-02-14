@@ -1,12 +1,13 @@
 /**
- * @author : Theo Le Donne
- *			 Gregoire Boiron <gregoire.boiron@gmail.com>
- * 
+ * @authors : Theo Le Donne
+ *			  Gregoire Boiron <gregoire.boiron@gmail.com>
+ * @version : 0.1.1
+ *
  * Execute "mongod" in a terminal then "node pageRank.js" in another terminal
  */
 
-// Get the mapReduceModule
-var mapReduce = require('./public/js/mapReduceModule');
+// Import custom modules
+const mapReduceModule = require('./public/js/mapReduceModule');
 
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/"
@@ -30,36 +31,8 @@ MongoClient.connect(url,function(err,db) {
         dbo.collection("Pages").insertMany(graph, function(err,res){
             if (err) throw err;
             console.log("Number of nodes : " + res.insertedCount)
-
-            function pageRank(i, max, end){
-                dbo.collection("Pages").mapReduce(mapReduce.map, mapReduce.reduce, {out: {replace: "Pages"}}, function(err,fin) {
-                    if (err) throw err
-                    if (i==max) end();
-                    
-                    else {
-                        console.log("  ");
-                        console.log("  ");
-                        console.log("Iteration n° " + i);
-                        fin.findOne({"_id" : "A"}, function(err, result){
-                            console.log(result);
-                        });
-                        fin.findOne({"_id" : "B"}, function(err, result){
-                            console.log(result);
-                        });
-                        fin.findOne({"_id" : "C"}, function(err, result){
-                            console.log(result);
-                        });
-                        fin.findOne({"_id" : "D"}, function(err, result){
-                            console.log(result);
-                        });
-                        console.log("  ");
-                        pageRank(i+1,max,end);
-                    }
-                });
-
-            }
-        
-            pageRank(0,21,function end() {
+			
+            mapReduceModule.pageRank(0, 21, dbo, function end() {
                 console.log("End");
                 db.close;
             });
@@ -69,3 +42,5 @@ MongoClient.connect(url,function(err,db) {
     });//createCollection
 
 });//connect
+
+
