@@ -3,11 +3,21 @@ Website developed for class [*Distributed Databases* **(8INF803)**](http://cours
 
 The main objective is to use the MapReduce algorithm on a database (containing spells) to filter them and find the right one.
 
+# Prerequisites
+
+To be able to play with our application, you need to have both a [MongoDB](https://www.mongodb.com/) and a [SQlite](https://www.sqlite.org//index.html) databases available. Those twos services are already included into the application dependencies, but you need to install in into your desktop to be able to work properly.
+
+To Launch a mongodb database, you need to create severals folders and execute some commands. Good tutorials can be found online. Once you settup MongoDB, you can go the bin folder and enter in the Windows command line :
+
+`> mongod.exe`
+
+If you install it properly, you should be able to see the "`Waiting for connections on port 27017`" message at the end.
+
 # Getting started
 Once you have pull the project, you first have to launch the server.
-You have to open a windows terminal and enter the following command :
+You have to open a windows command line and enter the following command :
 
-`node server.js`
+`> node server.js`
 
 The server will be ready to receive clients requests. To do so, go to your favorite browser and visit *localhost:8080* webpage.
 
@@ -20,8 +30,8 @@ The following list is all the node.js modules we installed to make our applicati
 * [express](https://npmjs.com/package/express)
 * [crawler](https://npmjs.com/package/crawler)
 * [socket.io](https://npmjs.com:package/socket.io)
-
-
+* [mongodb](https://www.npmjs.com/package/mongodb)
+* [sqlite3](https://www.npmjs.com/package/sqlite3)
 
 # Contributors
 * [Grégoire Boiron](https://github.com/Graygzou)
