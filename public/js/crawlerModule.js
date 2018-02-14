@@ -80,12 +80,24 @@ var crawlerPage = function(url) {
 
 					// Create a database
 					var spellsFinderDb = db.db(dbName);
-					
+					/*
+					spellsFinderDb.listCollections().toArray(function(err, collections){
+						//collections = [{"name": "coll1"}, {"name": "coll2"}]
+						collections.forEach(function(elem) {
+							if (collecName === elem.name) {
+								spellsFinderDb.collection(collecName).drop();
+							}
+						});	
+					});*/
+
 					// Create a test collection
 					spellsFinderDb.createCollection(collecName, function(err, res) {
 						if (err) throw err;
 						console.log("Collection created!");
 					});
+					
+					// Remove all the documents
+					spellsFinderDb.collection(collecName).removeMany();
 
 					// Insert the current value in the database
 					spellsFinderDb.collection(collecName).insertOne(currentSpell, function(err, res) {

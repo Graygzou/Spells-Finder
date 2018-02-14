@@ -4,8 +4,8 @@
  * @version : 0.1.1
  */
 
-  /**
-  * pageRank - Compute the map reduce algorithm to process a page rank.
+/** pageRank 
+  * Compute the map reduce algorithm to process a page rank.
   *
   * @param {int} i - Number of the current iteration.
   * @param {int} max - Maximum number of iterations the algorithm will process. 
@@ -39,8 +39,8 @@ var pageRank = function(i, max, dbo, end) {
 	});
 }
  
- /**
-  * findSpells - Compute the map reduce algorithm to find a particular spell.
+/** findSpells 
+  * Compute the map reduce algorithm to find a particular spell.
   *
   * @param {int} i - Number of the current iteration.
   * @param {int} max - Maximum number of iterations the algorithm will process. 
@@ -56,20 +56,11 @@ function findSpells(i, max, db, end){
 			console.log("  ");
 			console.log("  ");
 			console.log("Iteration n° " + i);
-			fin.findOne({"_id" : "A"}, function(err, result){
-				console.log(result);
-			});
-			fin.findOne({"_id" : "B"}, function(err, result){
-				console.log(result);
-			});
-			fin.findOne({"_id" : "C"}, function(err, result){
-				console.log(result);
-			});
-			fin.findOne({"_id" : "D"}, function(err, result){
+			fin.findOne({name : 'Acid Arrow'}, function(err, result){
 				console.log(result);
 			});
 			console.log("  ");
-			findSpells(i+1,max,end);
+			findSpells(i+1, max, db, end);
 		}
 	});
 }
@@ -80,6 +71,9 @@ function findSpells(i, max, db, end){
 // --------------------------------------------------------------
  
 // {_id:"A", value: {pagerank:1, outlink_list:["A","B","C"]} },
+/** mapSpells 
+  * map function executed by MongoDB interpreter.
+  */
 var mapPageRank = function() {
 	var page = this._id;
 	var pagerank = this.value.pagerank;
@@ -98,28 +92,35 @@ var mapPageRank = function() {
 };
 
 //school, [level, components, range, {SpellResistance: spellResistance}])
+/** mapSpells 
+  * map function executed by MongoDB interpreter.
+  */
 var mapSpells = function() {
-	var spell = this.value.name;
-	var level = this.value.level;
-	var components = this.value.components;
-	var range = this.value.range;
-	var SpellResistance = this.value.SpellResistance;
-	var linkPageRank = 0;
-
-	/*print("-----Map-----");
-	print("Page", page);
-	print("Pagerank", pagerank);
-	print("List", outlink_list);*/
-	/*
-	emit(page,outlink_list);
-
-	for (var i=0, len=outlink_list.length; i<len; i++){
-		var outlink = outlink_list[i];
-		if (page!==outlink) var linkPageRank = pagerank/(outlink_list.length-1); //the default pageRank for the node itself is set to 0
-		//print("outlink", tojson(outlink))
-		//print("pagerank", tojson(linkPageRank));
-		emit(outlink,linkPageRank);
-	}*/
+	print(tojson(this));
+	
+	var id = this._id;
+	print(id);
+	var school = this.school;
+	print(school);
+	var spell = this.name;
+	print(spell);
+	var level = this.level;
+	print(level);
+	var components = this.components;
+	print(components);
+	var range = this.range;
+	print(range);
+	var SpellResistance = this.SpellResistance;
+	print(SpellResistance);
+	
+	// Check if the current spell match our criterion
+	if (true) {
+		// The current spell does match.
+		emit(spell, 1);
+	} else {
+		// The current spell doesn't match.
+		emit(spell, 0);
+	}
 };
 
 var reducePageRank = function(page,values){
@@ -142,30 +143,26 @@ var reducePageRank = function(page,values){
 	return obj;
 };
 
-var reduceSpells = function(page,values){
-	/*print("-----Reduce-----");
-	print("key : " , tojson(page));
-	print("values : ", tojson(values));*/
-	/*
-
-	var outlink_list = [];
-	var pagerankSum = 0;
-	var damping = 0.85;
-	var nbOfNodes = this.insertedCount;
-	var obj = {};
+/** reduceSpells
+ * TODO
+ */
+var reduceSpells = function(key, values){
 	
-	for (var i=0, len=values.length; i<len; i++){
-		//print("values[i] : ", values[i]);
-		if (values[i] instanceof Array) {
-			outlink_list=values[i];}
-		else {                        
-			pagerankSum += values[i];
-		}
+	print("1er Reduce : ", tojson(key), tojson(values));
+	var full = {};
+
+	//First, find the original one
+	for (var i = 0; i < values.length; i++)
+	{
+	   var val = values[i];
+	   if (val.type == "full") {
+		   full = val;
+	   }
 	}
-	var newPageRank = 1 - damping + ( damping*pagerankSum );
-	obj = {pagerank:newPageRank, outlink_list: outlink_list}
-	//print("obj : " , tojson(obj));
-	return obj;*/
+
+	print("Full object de ", key);
+	print(tojson(full));
+	return full;
 }
 
 // Export module functions
