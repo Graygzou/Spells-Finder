@@ -51,13 +51,13 @@ var crawlerPage = function(url) {
 
                 var description = $($('div.SpellDiv').children()[11]).text();
 
-				// 
+				/*
 				console.log(spellTitle)
 				console.log(school);
 				console.log(level);
 				console.log(components);
 				console.log(range);
-				console.log("SpellResistance :" + spellResistance);
+				console.log("SpellResistance :" + spellResistance);*/
 				
 				/*
                 console.log("Level            : " + level);
@@ -71,7 +71,7 @@ var crawlerPage = function(url) {
                 console.log("Description      : " + description);*/
 				
 				var currentSpell = parserModule.JSONConcat({name: spellTitle}, [school, level, components, range, {SpellResistance: spellResistance}])
-				console.log(currentSpell);
+				//console.log(currentSpell);
 				
 				// Use connect method to connect to the server
 				MongoClient.connect(dbUrl, function(err, db) {
