@@ -69,8 +69,9 @@ function findSpells(i, max, dbUrl, dbName, collecName, arguments, endCallback){
 			return (true);
 		}*/
 	
-		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, function () {
+		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, function (result) {
 			console.log("-- MapReduce finished --");
+			console.log(result);
 		});
 
 	});
@@ -127,9 +128,10 @@ var mapSpells = function() {
 	// Check if the current spell match our criterion
 	var value = {};
 	print(spellArguments);
-	if (this.level <= spellArguments.level && this.school == spellArguments.level && 
+	/*if (this.level <= spellArguments.level && this.school == spellArguments.level && 
 		this.SpellResistance == spellArguments.SpellResistance &&
-		checkComponents(spellArguments.components, this.components) ) {
+		checkComponents(spellArguments.components, this.components) ) {*/
+	if(true) {
 		// The current spell does match.
 		value = { 
 				 name: this.name,

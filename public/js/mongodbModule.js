@@ -106,29 +106,9 @@ var getAllDocuments = function(collecName, callback) {
 var mapReduceSpells = function(collecName, arguments, mapSpells, reduceSpells, callback) {
 	spellsFinderdb.collection(collecName).mapReduce(mapSpells, reduceSpells, { out: {replace: "validSpells"}, scope: { spellArguments: arguments } })
 	.then(function (collection) {
-		collection.findOne({}, function(err, result) {
-				if (err) throw err;
-				console.log(result);
-		});
-		collection.find().toArray().then(function (docs) {
-		   console.log(docs);
-		   console.log("************************************************************************");
-		   console.log("************************************************************************");
-		   console.log("************************************************************************");
-
-		   //1ere condition d'arrêt. Le graphe converge (algo fini)
-		   //Sinon, on a egalement un maximum d'iterations
-		   //Nombre max d'iterations atteint
-
-		   // Peform a simple find and return all the documents
-		   collection.find({"isValid": 1}).toArray().then(function (docs) {
-			   console.log("GROS LOG DES DOCS TROUVES");
-			   console.log("************************************************************************");
-			   console.log(docs);
-
-			   console.log("SORTIE TAKEN");
-			   callback();
-		   });
+		collection.find({}).toArray().then(function (docs) {
+		   // Send the result to the callback
+		   callback(docs);
 	   });
 	});
 }
