@@ -47,17 +47,18 @@ var pageRank = function(i, max, dbo, end) {
   * @param {object} db - opened database ready to execute queries.
   * @param {callback} end - function called when the algorithm has finished.
   */
-function findSpells(i, max, db, cb){
+function findSpells(i, max, db, checkFunction, endCallback){
 	db.collection("spells")
 		.mapReduce(mapSpells, 
 				reduceSpells, 
 				{
-					out: {replace: "spells"}, 
-					query: { ord_date:
-						{ $gt: new Date('01/01/2012') }
-						}
+					out: {replace: "validSpells"}
 				})
 		.then(function (collection) {
+				collection.findOne({}, function(err, result) {
+						if (err) throw err;
+						console.log(result);
+				});
                collection.find().toArray()
                    .then(function (docs)
                    {
@@ -74,7 +75,7 @@ function findSpells(i, max, db, cb){
                            cb();
 
                        // Peform a simple find and return all the documents
-                       collection.find({"value.changed": true}).toArray()
+                       collection.find({"isValid": 1}).toArray()
                            .then(function (docs)
                            {
 
@@ -130,7 +131,7 @@ var mapPageRank = function() {
 var mapSpells = function() {
 	//print(tojson(this));
 	
-	var spell = this.name;
+	var key = this.name;
 	//print(spell);
 	var school = this.school;
 	//print(school);
@@ -144,14 +145,23 @@ var mapSpells = function() {
 	//print(SpellResistance);
 	
 	// Check if the current spell match our criterion
-	var objet = {};
-	if (true) {
+	var value = {};
+	if (checkFunction(this)) {
 		// The current spell does match.
-		emit(this.name, 1);
+		value = { 
+				 name: this.name,
+				 isValid: 1
+				};
+		emit(key, value);
 	} else {
 		// The current spell doesn't match.
-		emit(this.name, 0);
+		value = { 	
+					name: 'toto',
+					isValid: 0
+				};
+		// nothing ?
 	}
+	
 	
 };
 
@@ -179,42 +189,20 @@ var reducePageRank = function(page,values){
 };
 
 /** reduceSpells
- * TODO
+ * apply the reduce function based on isValid attribute
  */
 var reduceSpells = function(key, values){
 	
 	print("1er Reduce : ", tojson(key), tojson(values));
-	var obj = {};
+	var reducedVal = { names : [] };
+	
+	for (var i = 0; i < values.length; i++){
+		reducedVal.names[i] = values[i].name
+	}s
 
-	// Right now, the spell doesn't correspond our criterion
-    full.changed = false;
-	
-	for (var i=0, len=values.length; i<len; i++){
-		if (values[i] instanceof Array) {
-			outlink_list=values[i];}
-		else {                        
-			pagerankSum += values[i];
-		}
-	}
-	
-	//First, find the original one
-	for (var i = 0; i < values.length; i++)
-	{
-		var val = values[i];
-		if (val.type == "compact") {
-			if(val.isValid == true) {
-				full.changed = true;
-				full.isValid = true;
-		   }
-		}
-	}
-	
-	var newPageRank = 1 - damping + ( damping*pagerankSum );
-	obj = {pagerank:newPageRank, outlink_list: outlink_list}
-
-	print("Full object de ", key);
+	print("Full object de ", reducedVal);
 	//print(tojson(full));
-	return obj;
+	return reducedVal;
 }
 
 // Export module functions

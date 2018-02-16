@@ -45,7 +45,7 @@
 		<section class="center-section">
 			<h1>Trouvez le sort qui vous correspond ! </h1>
 		
-			<a class="waves-effect waves-light btn-large" id="next" href="formulaire.html"><i class="material-icons right">send</i>Démarrer</a>
+			<a class="waves-effect waves-light btn-large" id="compute"><i class="material-icons right">send</i>Compute</a>
 			
 		</section>
 		
@@ -147,17 +147,8 @@
 		<script>
             var socket = io.connect('http://localhost:8080');
 			
-			// Ask the user nickname
-            /*var pseudo = prompt('Quel est votre pseudo ?');
-            // Send it zith the tag "petit_nouveau" (unlike the "message" tag)
-            socket.emit('petit_nouveau', pseudo);
-			
-            socket.on('message', function(message) {
-                alert('Le serveur a un message pour vous : ' + message['content']);
-            })*/
-
-            $('#next').click(function () {
-                socket.emit('get', 'http://google.com');
+			$('#compute').click(function () {
+                socket.emit('compute', { school:'conjuration' , level:'2', component:['V'], spellResistance:'no' });
             });
         </script>
 	</body>
