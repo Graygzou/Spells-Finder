@@ -88,7 +88,7 @@ var webScraper = function(url, dbcallback) {
 				console.log("Description      : " + description);*/
 				
 				var currentSpell = parserModule.JSONConcat({name: spellTitle}, [school, level, components, range, {SpellResistance: spellResistance}])
-				console.log(currentSpell);
+				//console.log(currentSpell);
 
 				dbcallback(currentSpell);
 					/*

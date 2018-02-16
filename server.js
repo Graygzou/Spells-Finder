@@ -26,7 +26,7 @@ app.use(express.static(__dirname + 'public'));
 // Get our custom modules
 var crawlerModule = require('./public/js/crawlerModule');
 var mapReduceModule = require('./public/js/mapReduceModule');
-var mongodb = require('./public/js/mongodbModule');
+var mongodbModule = require('./public/js/mongodbModule');
 var sqlite = require('./public/js/sqliteModule');
 
 
@@ -74,15 +74,24 @@ io.sockets.on('connection', function (socket) {
         console.log('Un client me parle ! Il me dit : ' + message);
 		
 		// Reset and Setup of MongoDB database
-		mongodb.setupMongoDB(dbUrl, dbName, collecName, function end() {
-			console.log("-- Finish setup --");
-			// Start the crawling algorithm
-			startCrawler(function () {
-				console.log("-- Finish crawling --");
-				
-				//getSpecificSpell();
-				
-				mongodb.closeSpellsdb();
+		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
+			console.log("-- Finished setup --");
+			
+			mongodbModule.removeAllCollection(collecName, function () {
+				console.log("-- Finished removeAll --");
+			
+				mongodbModule.createCollections(collecName, function () {
+					console.log("-- Finished createCollection --");
+					
+					// Start the crawling algorithm
+					startCrawler(function () {
+						console.log("-- Finish crawling --");
+						
+						//getSpecificSpell();
+						
+						mongodbModule.closeSpellsdb();
+					});
+				});
 			});
 		});
     });
@@ -90,18 +99,16 @@ io.sockets.on('connection', function (socket) {
 	socket.on('compute', function (message) {
         console.log('Un client me parle ! Il me dit : ' + message);
 
-		/** checkIfValid
-		 * function called by the map function to know if a specific spell match the parameters.
-		 * @param {JSON} currentSpell - spell currently evaluated by the mapReduce algorithm.
-		 */
-		var checkIfValid = function(currentSpell) {
-			return (true);
-		}
-		
-		// Call the mapReduce function created for spells.
-		mapReduceModule.findSpells(0, 1, spellsFinderDb, checkIfValid, function end() {
-			console.log("End map reduce");
-			db.close;
+		mongodbModule.getAllDocuments(collecName, function (results) {
+			//console.log(results);
+			
+			// Call the mapReduce function created for spells.
+			var spellArgument = {school: 'conjuration', level: 2, components: ['V', 'S'], SpellResistance: 'no'};
+			
+			mapReduceModule.findSpells(0, 1, dbUrl, dbName, collecName, spellArgument, function end() {
+				console.log("End map reduce");
+				db.close;
+			});
 		});
 		
     });	
@@ -121,5 +128,6 @@ var startCrawler = function(endCallback) {
 }
 
 var insertMongoCallback = function(jsonData) {
-	mongodb.insertSpell(collecName, jsonData);
+	mongodbModule.insertSpell(collecName, jsonData);
+	console.log("1 document inserted");
 }

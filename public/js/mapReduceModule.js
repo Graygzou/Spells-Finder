@@ -4,6 +4,11 @@
  * @version : 0.1.1
  */
 
+ var mongodbModule = require('./mongodbModule');
+ 
+ // JSON object containing spell arguments.
+ var spellArguments;
+ 
 /** pageRank 
   * Compute the map reduce algorithm to process a page rank.
   *
@@ -44,56 +49,31 @@ var pageRank = function(i, max, dbo, end) {
   *
   * @param {int} i - Number of the current iteration.
   * @param {int} max - Maximum number of iterations the algorithm will process. 
-  * @param {object} db - opened database ready to execute queries.
+  * @param {object} dbUrl - opened database ready to execute queries.
   * @param {callback} end - function called when the algorithm has finished.
   */
-function findSpells(i, max, db, checkFunction, endCallback){
-	db.collection("spells")
-		.mapReduce(mapSpells, 
-				reduceSpells, 
-				{
-					out: {replace: "validSpells"}
-				})
-		.then(function (collection) {
-				collection.findOne({}, function(err, result) {
-						if (err) throw err;
-						console.log(result);
-				});
-               collection.find().toArray()
-                   .then(function (docs)
-                   {
-                       console.log(docs);
-                       console.log("************************************************************************");
-                       console.log("************************************************************************");
-                       console.log("************************************************************************");
-
-                       //1ere condition d'arrêt. Le graphe converge (algo fini)
-                       //Sinon, on a egalement un maximum d'iterations
-                       //Nombre max d'iterations atteint
-                       console.log("VALEUR DE I = ", i);
-                       if (i == max)
-                           cb();
-
-                       // Peform a simple find and return all the documents
-                       collection.find({"isValid": 1}).toArray()
-                           .then(function (docs)
-                           {
-
-                               console.log("GROS LOG DES DOCS TROUVES");
-                               console.log("************************************************************************");
-                               console.log(docs);
-
-                               if (docs.length == 0) {
-                                   console.log("SORTIE TAKEN");
-                                   cb();
-                               }
-                               else {
-                                   console.log("ENCORE UNE ITERATION");
-                                   findSpells(i + 1, max, db, cb);
-                               }
-                           });
-                   });
+function findSpells(i, max, dbUrl, dbName, collecName, arguments, endCallback){
+	
+	spellArguments = arguments;
+	//console.log(arguments);
+	
+	// re connect to the mongodb client
+	mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
+		console.log("-- Finished setup --");		
+		
+		/** checkIfValid
+		 * function called by the map function to know if a specific spell match the parameters.
+		 * @param {JSON} currentSpell - spell currently evaluated by the mapReduce algorithm.
+		 */
+		/*checkFunction = function(spellArguments) {
+			return (true);
+		}*/
+	
+		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, function () {
+			console.log("-- MapReduce finished --");
 		});
+
+	});
 }
 
 
@@ -146,7 +126,10 @@ var mapSpells = function() {
 	
 	// Check if the current spell match our criterion
 	var value = {};
-	if (checkFunction(this)) {
+	print(spellArguments);
+	if (this.level <= spellArguments.level && this.school == spellArguments.level && 
+		this.SpellResistance == spellArguments.SpellResistance &&
+		checkComponents(spellArguments.components, this.components) ) {
 		// The current spell does match.
 		value = { 
 				 name: this.name,
@@ -164,6 +147,23 @@ var mapSpells = function() {
 	
 	
 };
+
+
+var checkComponents = function(givenComponents, currentSpellComponents) {
+	if(givenComponents.length != currentSpellComponents.length) {
+		return false;
+	} else {
+		var i = 0;
+		var equals = true;
+		while(equals && i < currentSpellComponents.length) {
+			// if the current item is not 
+			if(givenComponents.indexOf(currentSpellComponents[i]) == -1) {
+				var equals = false;
+			}
+		}
+		return equals;
+	}
+}
 
 /** reducePageRank
  *

@@ -26,30 +26,22 @@ var setupMongoDB = function(dbUrl, dbName, collecName, callback) {
 		
 		spellsFinderdb = db.db(dbName);
 		
-		spellsFinderdb.createCollection(collecName, function(err, res) {
-			if (err) throw err;
-			console.log("Collection "+ collecName +" created!");
-		});
-		
-		// Remove all the documents
-		spellsFinderdb.collection(collecName).removeMany();
-		
-		console.log("everything removed from " + collecName);
-		
 		// Call the end callback
 		callback();
 	});
 }
 
-/** createSpellCollections
+/** createCollections
  * Function that create a collection
  *
  * @param {string} collecName - name of the collection
  */
-var createSpellCollections = function(collecName) {
+var createCollections = function(collecName, callback) {
 	// Create a test collection
-	connect.then(function(db) {
+	spellsFinderdb.createCollection(collecName, function(err, res) {
+		if (err) throw err;
 		
+		callback();
 	});
 }
 
@@ -58,8 +50,11 @@ var createSpellCollections = function(collecName) {
  *
  * @param {string} collecName - name of the collection
  */
-var removeAllCollection = function(collecName) {
+var removeAllCollection = function(collecName, callback) {
+	// Remove all the documents
+	spellsFinderdb.collection(collecName).removeMany();
 	
+	callback();
 }
 
 /** insertSpell
@@ -72,7 +67,6 @@ var insertSpell = function(collecName, jsondata){
 	// Insert the current value in the database
 	spellsFinderdb.collection(collecName).insertOne(jsondata, function(err, res) {
 		if (err) throw err;
-		console.log("1 document inserted into " + collecName);
 	});
 }
 
@@ -87,24 +81,75 @@ var insertSpell = function(collecName, jsondata){
  * @param {array} materials - arrays of string that contains materials needed
  */
 var getSpecificSpell = function(collecName, maxLevel, isVerbose, isSomatic, provideResistance, materials) {
-	spellsFinderDb.collection(collecName).findOne({}, function(err, result) {
+	spellsFinderdb.collection(collecName).findOne({}, function(err, result) {
 		if (err) throw err;
 		console.log(result);
 	});
 }
 
+/** getAllDocuments
+ * Let the user retrieve all the documents of a collection
+ *
+ * @param {string} collecName - name of the collection
+ */
+var getAllDocuments = function(collecName, callback) {
+	spellsFinderdb.collection(collecName).find({}).toArray(function(err, result) {
+		if (err) throw err;
+		callback(result);
+	});
+}
+
+/** mapReduceSpells
+ * Apply mapReduce algorithm on a specified collection
+ *
+ */
+var mapReduceSpells = function(collecName, arguments, mapSpells, reduceSpells, callback) {
+	spellsFinderdb.collection(collecName).mapReduce(mapSpells, reduceSpells, { out: {replace: "validSpells"}, scope: { spellArguments: arguments } })
+	.then(function (collection) {
+		collection.findOne({}, function(err, result) {
+				if (err) throw err;
+				console.log(result);
+		});
+		collection.find().toArray().then(function (docs) {
+		   console.log(docs);
+		   console.log("************************************************************************");
+		   console.log("************************************************************************");
+		   console.log("************************************************************************");
+
+		   //1ere condition d'arrêt. Le graphe converge (algo fini)
+		   //Sinon, on a egalement un maximum d'iterations
+		   //Nombre max d'iterations atteint
+
+		   // Peform a simple find and return all the documents
+		   collection.find({"isValid": 1}).toArray().then(function (docs) {
+			   console.log("GROS LOG DES DOCS TROUVES");
+			   console.log("************************************************************************");
+			   console.log(docs);
+
+			   console.log("SORTIE TAKEN");
+			   callback();
+		   });
+	   });
+	});
+}
+
+
 /**
  * Function that close the current database
  */
 var closeSpellsdb = function() {
-	connect.then(function(db) {
-		db.close;
-		console.log('Close the database connection.')
-	});
+	spellsFinderdb.close;
 }
 
 // Export module functions
 exports.setupMongoDB 		= setupMongoDB;
-exports.insertSpell 		= insertSpell;
-exports.getSpecificSpell 	= getSpecificSpell;
+exports.createCollections 	= createCollections
 exports.closeSpellsdb 		= closeSpellsdb; 
+
+exports.insertSpell 		= insertSpell;
+exports.removeAllCollection = removeAllCollection;
+
+exports.getAllDocuments		= getAllDocuments;
+exports.getSpecificSpell 	= getSpecificSpell;
+
+exports.mapReduceSpells		= mapReduceSpells;
