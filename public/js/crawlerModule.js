@@ -35,19 +35,17 @@ var createCrawler = new Crawler({
  *
  * @param {string} url - Uniform Resource Locator (URL) of the webpage.
  */
-var webScraper = function(url, dbcallback) {
-	console.log('URl : ' + url);
-
+var webScraper = function(url, numPage, dbcallback, lastIDPages, endCallback) {
 	createCrawler.queue([{
-		uri: url,
-	 
+		uri: url + numPage,
+		id: numPage,
 		// The global callback won't be called
 		callback: function (error, res, done) {
 			if (error) {
 				console.log(error);
 			} else {
 				var $ = res.$;
-
+				
 				// Parser
 				var spellTitle = $('div.heading').find('p').text();
 
@@ -89,8 +87,14 @@ var webScraper = function(url, dbcallback) {
 				
 				var currentSpell = parserModule.JSONConcat({name: spellTitle}, [school, level, components, range, {SpellResistance: spellResistance}])
 				//console.log(currentSpell);
-
+		
+				// call MongoDB callback to insert the data into mongodb
 				dbcallback(currentSpell);
+				
+				// Check if this is the last page
+				if (res.options.id == lastIDPages) {
+					endCallback();
+				}
 					/*
 					spellsFinderDb.listCollections().toArray(function(err, collections){
 						//collections = [{"name": "coll1"}, {"name": "coll2"}]

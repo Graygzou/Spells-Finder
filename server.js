@@ -9,6 +9,7 @@
  
 var http = require('http');
 var fs = require('fs');
+
 var express = require('express'),
     app = module.exports.app = express();
 
@@ -21,7 +22,7 @@ server.listen(8080);  //listen on port 80
 // -------------------------------------
 
 // Let express know there's a public directory.
-app.use(express.static(__dirname + 'public'));
+app.use(express.static(__dirname + '/public'));
 
 // Get our custom modules
 var crawlerModule = require('./public/js/crawlerModule');
@@ -85,11 +86,17 @@ io.sockets.on('connection', function (socket) {
 					
 					// Start the crawling algorithm
 					startCrawler(function () {
+						
+						
 						console.log("-- Finish crawling --");
 						
 						//getSpecificSpell();
 						
 						mongodbModule.closeSpellsdb();
+						
+						// Let know the client he can step over to the next page
+						socket.emit('finish', 'Finish crawling');
+						
 					});
 				});
 			});
@@ -120,11 +127,11 @@ io.sockets.on('connection', function (socket) {
 
 var startCrawler = function(endCallback) {
 	
+	var maxNumber = 5;
 	var url = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=";
-	for(var id = 1; id < 5; id++) {
-		crawlerModule.webScraper(url + id, insertMongoCallback);
+	for(var id = 1; id <= maxNumber; id++) {
+		crawlerModule.webScraper(url, id, insertMongoCallback, maxNumber, endCallback);
 	}
-	endCallback();
 }
 
 var insertMongoCallback = function(jsonData) {

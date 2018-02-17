@@ -1,8 +1,27 @@
-.center-section { 
+#center-section { 
 	text-align: center; 
 	padding: 100px;
 }
 
+#preloader {
+	text-align: center;
+	margin: 200px;
+}
+
+.section {
+	margin-top: 80px;
+}
+
 .padding-left {
 	padding-left: 10px;
+}
+
+.checkbox-div > p {
+	display: inline-block;
+	margin-right: 5%;
+}
+
+form > label {
+	display: block;
+	text-align: left;
 }
