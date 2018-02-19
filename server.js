@@ -121,13 +121,12 @@ io.sockets.on('connection', function (socket) {
 			console.log("-- Finished setup --");
 			
 			mongodbModule.getAllDocuments(collecName, function (results) {
-				console.log(results);
-			
+
 				// Call the mapReduce function created for spells.
 				//var spellArgument = {school: 'conjuration', level: 2, components: ['V', 'S'], SpellResistance: 'no'};
 				
 				mapReduceModule.findSpells(0, 1, dbUrl, dbName, collecName, spellArgument, function (results) {
-					console.log(results);
+					//console.log(results);
 					
 					// Let know the client he can print the results
 					socket.emit('results', results);
@@ -143,6 +142,7 @@ io.sockets.on('connection', function (socket) {
 
 var startCrawler = function(endCallback) {
 	
+	//var maxNumber = 1975;
 	var maxNumber = 5;
 	var url = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=";
 	for(var id = 1; id <= maxNumber; id++) {

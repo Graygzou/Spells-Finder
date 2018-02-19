@@ -114,11 +114,11 @@
 							<label for="divinefocus">Divine Focus (DF)</label>
 						</p>
 					</div>
-				<div>
+				</div>
 				<div class="field">
 					<!-- Level and Class field -->
 					<label>
-						Class and Level 
+						Class
 						<div class="switch">
 							<label>
 							Off
@@ -141,6 +141,9 @@
 						<option value="9">Sorcerer</option>
 						<option value="10">Wizard</option>
 					</select>
+					<label>
+						Level 
+					</label>
 					<p class="range-field">
 						<input type="range" id="level-value" min="0" max="9" />
 					</p>
@@ -189,7 +192,7 @@
 						Oui
 						</label>
 					</div>
-				</	div>
+				</div>
 			</form>
 			<br>
 			<a class="waves-effect waves-light btn-large" id="compute"><i class="material-icons right">send</i>Chercher</a>
@@ -214,7 +217,11 @@
 				<thead>
 					<tr>
 						<th>Name</th>
-						<th>Values</th>
+						<th>School</th>
+						<th>Level</th>
+						<th>Components</th>
+						<th>Range</th>
+						<th>Spell Resistance</th>
 					</tr>
 				</thead>
 				<tbody id="spells-table">
@@ -277,13 +284,23 @@
 					
 					for (var key in jsonObj[spell]) {
 						if (jsonObj[spell].hasOwnProperty(key)) {
-							console.log(key + " -> " + jsonObj[spell][key]);
-							//container.innerHTML += key + " -> " + ;
-							
-							var currentTD = document.createElement("td");
-							var text = document.createTextNode(jsonObj[spell][key]);
-							currentTD.appendChild(text);
-							currentTR.appendChild(currentTD);
+							if(key == 'value') {
+								for (var val in jsonObj[spell][key]) {
+									console.log(val);
+									var currentTD = document.createElement("td");
+									var text = document.createTextNode(jsonObj[spell][key][val]);
+									currentTD.appendChild(text);
+									currentTR.appendChild(currentTD);
+								}
+							} else {
+								console.log(key + " -> " + jsonObj[spell][key]);
+								//container.innerHTML += key + " -> " + ;
+								
+								var currentTD = document.createElement("td");
+								var text = document.createTextNode(jsonObj[spell][key]);
+								currentTD.appendChild(text);
+								currentTR.appendChild(currentTD);
+							}
 						}
 					}
 				}

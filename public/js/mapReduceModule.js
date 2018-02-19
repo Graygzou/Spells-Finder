@@ -69,7 +69,7 @@ function findSpells(i, max, dbUrl, dbName, collecName, arguments, endCallback){
 			return (true);
 		}*/
 	
-		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, checkComponents, function (result) {
+		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, checkComponents, getSpellLevel, function (result) {
 			console.log("-- MapReduce finished --");
 			endCallback(result);
 		});
@@ -105,37 +105,23 @@ var mapPageRank = function() {
   * map function executed by MongoDB interpreter.
   */
 var mapSpells = function() {
-	//print(tojson(this));
-	
-	var key = this.name;
-	//print(spell);
-	var school = this.school;
-	//print(school);
-	var level = this.level;
-	//print(level);
-	var components = this.components;
-	//print(components);
-	var range = this.range;
-	//print(range);
-	var SpellResistance = this.SpellResistance;
-	//print(SpellResistance);
-	
 	// Check if the current spell match our criterion
 	var value = {};
 	if(check(this, spellArguments)) {
+		// Find the level of the spell for the userClass
+		spellLevel = getSpellLevel(this.levels, spellArguments);
+		print(spellLevel);
 		// The current spell does match.
-		value = { 
-				 name: this.name,
-				 isValid: 1
-				};
-		emit(key, value);
+		value = {
+			school: this.school,
+			level: spellLevel,
+			components: this.components,
+			range: this.range,
+			spellResistance: this.SpellResistance
+		};
+		emit(this.name, value);
 	} else {
-		// The current spell doesn't match.
-		value = { 	
-					name: 'toto',
-					isValid: 0
-				};
-		// nothing ?
+		// nothing.
 	}
 	
 	
@@ -169,22 +155,19 @@ var reducePageRank = function(page,values){
  */
 var reduceSpells = function(key, values){
 	
-	print("1er Reduce : ", tojson(key), tojson(values));
 	var reducedVal = { names : [] };
 	
 	for (var i = 0; i < values.length; i++){
 		reducedVal.names[i] = values[i].name
 	}
-
-	print("Full object de ", reducedVal);
-	//print(tojson(full));
 	return reducedVal;
 }
 
+// ----------------------------------------
+// Private functions
+// ----------------------------------------
+
 var checkComponents = function(currentSpellComponents, givenComponents) {
-	//printjson(givenComponents);
-	//printjson(currentSpellComponents);
-	
 	var equals = true;
 	for (key in givenComponents) {
 		if(key == "levels") {
@@ -192,7 +175,7 @@ var checkComponents = function(currentSpellComponents, givenComponents) {
 			for (spellLevels in currentSpellComponents[key]) {
 				var spellClass = currentSpellComponents[key][spellLevels]["class"];
 				var spellLevel = currentSpellComponents[key][spellLevels]["level"];
-				printjson(spellClass);
+				//printjson(spellClass);
 				if(spellClass.indexOf(givenComponents["levels"]["class"]) != -1 && spellLevel <= givenComponents["levels"]["level"]) {
 					equals = true;
 				}
@@ -203,6 +186,26 @@ var checkComponents = function(currentSpellComponents, givenComponents) {
 	}
 	
 	return equals;
+}
+
+var getSpellLevel = function(currentSpellLevels, givenComponents) {
+	var level;
+	print("ici");
+	printjson(givenComponents);
+	for (spellLevels in currentSpellLevels) {
+		printjson(spellLevels)
+		var spellClass = currentSpellLevels[spellLevels]["class"];
+		var spellLevel = currentSpellLevels[spellLevels]["level"];
+		if (givenComponents.hasOwnProperty("levels")) {
+			if(spellClass.indexOf(givenComponents["levels"]["class"])) {
+				level = spellLevel;
+			}
+		} else {
+			 return spellLevel;
+		}
+	}
+	
+	return level;
 }
 
 // Export module functions
