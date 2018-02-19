@@ -103,8 +103,8 @@ var getAllDocuments = function(collecName, callback) {
  * Apply mapReduce algorithm on a specified collection
  *
  */
-var mapReduceSpells = function(collecName, arguments, mapSpells, reduceSpells, callback) {
-	spellsFinderdb.collection(collecName).mapReduce(mapSpells, reduceSpells, { out: {replace: "validSpells"}, scope: { spellArguments: arguments } })
+var mapReduceSpells = function(collecName, arguments, mapSpells, reduceSpells, checkFunction, callback) {
+	spellsFinderdb.collection(collecName).mapReduce(mapSpells, reduceSpells, { out: {replace: "validSpells"}, scope: { spellArguments: arguments, check: checkFunction } })
 	.then(function (collection) {
 		collection.find({}).toArray().then(function (docs) {
 		   // Send the result to the callback

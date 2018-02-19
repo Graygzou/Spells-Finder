@@ -69,7 +69,7 @@ function findSpells(i, max, dbUrl, dbName, collecName, arguments, endCallback){
 			return (true);
 		}*/
 	
-		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, function (result) {
+		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, checkComponents, function (result) {
 			console.log("-- MapReduce finished --");
 			endCallback(result);
 		});
@@ -101,7 +101,6 @@ var mapPageRank = function() {
 	}
 };
 
-//school, [level, components, range, {SpellResistance: spellResistance}])
 /** mapSpells 
   * map function executed by MongoDB interpreter.
   */
@@ -123,11 +122,14 @@ var mapSpells = function() {
 	
 	// Check if the current spell match our criterion
 	var value = {};
-	print(spellArguments);
+	print("ici" + spellArguments);
+	print("la" + check(this, spellArguments))
+	// checkComponents( this, spellArguments )
 	/*if (this.level <= spellArguments.level && this.school == spellArguments.level && 
 		this.SpellResistance == spellArguments.SpellResistance &&
 		checkComponents(spellArguments.components, this.components) ) {*/
 	if(true) {
+		//check(this, spellArguments)
 		// The current spell does match.
 		value = { 
 				 name: this.name,
@@ -145,23 +147,6 @@ var mapSpells = function() {
 	
 	
 };
-
-
-var checkComponents = function(givenComponents, currentSpellComponents) {
-	if(givenComponents.length != currentSpellComponents.length) {
-		return false;
-	} else {
-		var i = 0;
-		var equals = true;
-		while(equals && i < currentSpellComponents.length) {
-			// if the current item is not 
-			if(givenComponents.indexOf(currentSpellComponents[i]) == -1) {
-				var equals = false;
-			}
-		}
-		return equals;
-	}
-}
 
 /** reducePageRank
  *
@@ -201,6 +186,32 @@ var reduceSpells = function(key, values){
 	print("Full object de ", reducedVal);
 	//print(tojson(full));
 	return reducedVal;
+}
+
+var checkComponents = function(currentSpellComponents, givenComponents) {
+	//printjson(givenComponents);
+	//printjson(currentSpellComponents);
+	var equals = true;
+	for (key in givenComponents) {
+		equals = equals && givenComponents[key] == currentSpellComponents[key];
+		//print(key +" :" + givenComponents[key]);
+		//print(key + " :" + currentSpellComponents[key])
+	}
+	/*
+	if(givenComponents.length != currentSpellComponents.length) {
+		return false;
+	} else {
+		var i = 0;
+		var equals = true;
+		while(equals && i < currentSpellComponents.length) {
+			// if the current item is not 
+			if(givenComponents.indexOf(currentSpellComponents[i]) == -1) {
+				equals = false;
+			}
+			i++;
+		}
+		return equals;
+	}*/
 }
 
 // Export module functions
