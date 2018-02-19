@@ -30,11 +30,13 @@ function splitLevel(level) {
 	tab = [];
 	for (var i = 0, len = levelsArray.length; i<len;i++ ) {
 		var id = levelsArray[i].split(' ');
-		var json = {};
-		json[id[0]] = id[1];
+		var json = {
+			'class': id[0],
+			'level': id[1]
+		};
 		tab[i] = json;
 	}
-	levelJSON["level"] = tab;
+	levelJSON["levels"] = tab;
 	return levelJSON;
 }
 

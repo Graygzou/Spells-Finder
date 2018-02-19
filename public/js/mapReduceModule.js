@@ -122,14 +122,7 @@ var mapSpells = function() {
 	
 	// Check if the current spell match our criterion
 	var value = {};
-	print("ici" + spellArguments);
-	print("la" + check(this, spellArguments))
-	// checkComponents( this, spellArguments )
-	/*if (this.level <= spellArguments.level && this.school == spellArguments.level && 
-		this.SpellResistance == spellArguments.SpellResistance &&
-		checkComponents(spellArguments.components, this.components) ) {*/
-	if(true) {
-		//check(this, spellArguments)
+	if(check(this, spellArguments)) {
 		// The current spell does match.
 		value = { 
 				 name: this.name,
@@ -191,27 +184,25 @@ var reduceSpells = function(key, values){
 var checkComponents = function(currentSpellComponents, givenComponents) {
 	//printjson(givenComponents);
 	//printjson(currentSpellComponents);
+	
 	var equals = true;
 	for (key in givenComponents) {
-		equals = equals && givenComponents[key] == currentSpellComponents[key];
-		//print(key +" :" + givenComponents[key]);
-		//print(key + " :" + currentSpellComponents[key])
-	}
-	/*
-	if(givenComponents.length != currentSpellComponents.length) {
-		return false;
-	} else {
-		var i = 0;
-		var equals = true;
-		while(equals && i < currentSpellComponents.length) {
-			// if the current item is not 
-			if(givenComponents.indexOf(currentSpellComponents[i]) == -1) {
-				equals = false;
+		if(key == "levels") {
+			equals = false;
+			for (spellLevels in currentSpellComponents[key]) {
+				var spellClass = currentSpellComponents[key][spellLevels]["class"];
+				var spellLevel = currentSpellComponents[key][spellLevels]["level"];
+				printjson(spellClass);
+				if(spellClass.indexOf(givenComponents["levels"]["class"]) != -1 && spellLevel <= givenComponents["levels"]["level"]) {
+					equals = true;
+				}
 			}
-			i++;
+		} else {
+			equals = equals && givenComponents[key] == currentSpellComponents[key];
 		}
-		return equals;
-	}*/
+	}
+	
+	return equals;
 }
 
 // Export module functions

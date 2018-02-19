@@ -113,8 +113,8 @@ io.sockets.on('connection', function (socket) {
     });
 	
 	// "compute" means appling the map reduce algorithm to find a list of spells.
-	socket.on('compute', function (message) {
-        console.log('Un client me parle ! Il me dit : ' + message);
+	socket.on('compute', function (spellArgument) {
+        console.log('Un client me parle ! Il me dit : ' + spellArgument);
 		
 		// Setup MongoDB database
 		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
@@ -124,7 +124,7 @@ io.sockets.on('connection', function (socket) {
 				console.log(results);
 			
 				// Call the mapReduce function created for spells.
-				var spellArgument = {school: 'conjuration', level: 2, components: ['V', 'S'], SpellResistance: 'no'};
+				//var spellArgument = {school: 'conjuration', level: 2, components: ['V', 'S'], SpellResistance: 'no'};
 				
 				mapReduceModule.findSpells(0, 1, dbUrl, dbName, collecName, spellArgument, function (results) {
 					console.log(results);

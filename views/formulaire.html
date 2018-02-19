@@ -54,120 +54,142 @@
 			</p>
 			
 			<form action="#">
-				
-				<label>
-					School
-					<div class="switch">
-						<label>
-						Off
-						<input id="school-switch" type="checkbox">
-						<span class="lever"></span>
-						On
-						</label>
-					</div>
-				</label>
-				<select id="school-value" class="browser-default">
-					<option value="" disabled selected>Choose the spell's school</option>
-					<option value="1">Abjuration</option>
-					<option value="1">Conjuration</option>
-					<option value="2">Divination</option>
-					<option value="3">Enchantment</option>
-					<option value="4">Evocation</option>
-					<option value="5">Illusion</option>
-					<option value="6">Necromancy</option>
-					<option value="7">Transmutation</option>
-				</select>
-			
-				<label>
-					Components
-					<div class="switch">
-						<label>
-						Off
-						<input id="components-switch" type="checkbox">
-						<span class="lever"></span>
-						On
-						</label>
-					</div>
-				</label>
-				<div class="checkbox-div">
-					<p>
-						<input type="checkbox" id="verbal" />
-						<label for="verbal">Verbal (V)</label>
-					</p>
-					<p>
-						<input type="checkbox" id="somatic" />
-						<label for="somatic">Somatic (S)</label>
-					</p>
-					<p>
-						<input type="checkbox" id="material" />
-						<label for="material">Material (M)</label>
-					</p>
-					<p>
-						<input type="checkbox" id="focus"  />
-						<label for="focus">Focus (F)</label>
-					</p>
-					<p>
-						<input type="checkbox" id="divinefocus" />
-						<label for="divinefocus">Divine Focus (DF)</label>
-					</p>
-				</div>
-				
-				<label>
-					Level
-					<div class="switch">
-						<label>
-						Off
-						<input id="level-switch" type="checkbox">
-						<span class="lever"></span>
-						On
-						</label>
-					</div>
-				</label>
-				<p class="range-field">
-					<input type="range" id="level-value" min="0" max="9" />
-				</p>
-			
-				<label>
-					Range
-					<div class="switch">
-						<label>
-						Off
-						<input id="range-switch" type="checkbox">
-						<span class="lever"></span>
-						On
-						</label>
-					</div>
-				</label>
-				<select id="range-value" class="browser-default">
-					<option value="" disabled selected>Choose the spell's range</option>
-					<option value="1">Personal</option>
-					<option value="2">Touch</option>
-					<option value="3">Close</option>
-					<option value="4">Medium</option>
-					<option value="5">Long</option>
-					<option value="6">Unlimited</option>
-					<option value="7">Range Expressed in Feet</option>
-				</select>
-				
-				<label>
-					Spell Resistance
-					<div class="switch">
-						<label>
-						Off
-						<input id="resistance-switch" type="checkbox">
-						<span class="lever"></span>
-						On
-						</label>
-					</div>
-				</label>
-				<div class="switch">
+				<!-- School field -->
+				<div class="field">
 					<label>
-					Non
-					<input id="resistance-value" type="checkbox">
-					<span class="lever"></span>
-					Oui
+						School
+						<div class="switch">
+							<label>
+							Off
+							<input id="school-switch" type="checkbox">
+							<span class="lever"></span>
+							On
+							</label>
+						</div>
 					</label>
+					<select id="school-value" class="browser-default">
+						<option value="" disabled selected>Choose the spell's school</option>
+						<option value="1">Abjuration</option>
+						<option value="1">Conjuration</option>
+						<option value="2">Divination</option>
+						<option value="3">Enchantment</option>
+						<option value="4">Evocation</option>
+						<option value="5">Illusion</option>
+						<option value="6">Necromancy</option>
+						<option value="7">Transmutation</option>
+					</select>
 				</div>
+				<div class="field">
+					<!-- Components field -->
+					<label>
+						Components
+						<div class="switch">
+							<label>
+							Off
+							<input id="components-switch" type="checkbox">
+							<span class="lever"></span>
+							On
+							</label>
+						</div>
+					</label>
+					<div class="checkbox-div">
+						<p>
+							<input type="checkbox" id="verbal" />
+							<label for="verbal">Verbal (V)</label>
+						</p>
+						<p>
+							<input type="checkbox" id="somatic" />
+							<label for="somatic">Somatic (S)</label>
+						</p>
+						<p>
+							<input type="checkbox" id="material" />
+							<label for="material">Material (M)</label>
+						</p>
+						<p>
+							<input type="checkbox" id="focus"  />
+							<label for="focus">Focus (F)</label>
+						</p>
+						<p>
+							<input type="checkbox" id="divinefocus" />
+							<label for="divinefocus">Divine Focus (DF)</label>
+						</p>
+					</div>
+				<div>
+				<div class="field">
+					<!-- Level and Class field -->
+					<label>
+						Class and Level 
+						<div class="switch">
+							<label>
+							Off
+							<input id="level-switch" type="checkbox">
+							<span class="lever"></span>
+							On
+							</label>
+						</div>
+					</label>
+					<select id="class-value" class="browser-default">
+						<option value="1">Barbarian</option>
+						<option value="1">Bard</option>
+						<option value="2">Cleric</option>
+						<option value="3">Druid</option>
+						<option value="4">Fighter</option>
+						<option value="5">Monk</option>
+						<option value="6">Paladin</option>
+						<option value="7">Ranger</option>
+						<option value="8">Rogue</option>
+						<option value="9">Sorcerer</option>
+						<option value="10">Wizard</option>
+					</select>
+					<p class="range-field">
+						<input type="range" id="level-value" min="0" max="9" />
+					</p>
+				</div>
+				<!-- Range field -->
+				<div class="field">
+					<label>
+						Range
+						<div class="switch">
+							<label>
+							Off
+							<input id="range-switch" type="checkbox">
+							<span class="lever"></span>
+							On
+							</label>
+						</div>
+					</label>
+					<select id="range-value" class="browser-default">
+						<option value="" disabled selected>Choose the spell's range</option>
+						<option value="1">Personal</option>
+						<option value="2">Touch</option>
+						<option value="3">Close</option>
+						<option value="4">Medium</option>
+						<option value="5">Long</option>
+						<option value="6">Unlimited</option>
+						<option value="7">Range Expressed in Feet</option>
+					</select>
+				</div>
+				<div class="field">
+					<label>
+						Spell Resistance
+						<div class="switch">
+							<label>
+							Off
+							<input id="resistance-switch" type="checkbox">
+							<span class="lever"></span>
+							On
+							</label>
+						</div>
+					</label>
+					<div class="switch">
+						<label>
+						Non
+						<input id="resistance-value" type="checkbox">
+						<span class="lever"></span>
+						Oui
+						</label>
+					</div>
+				</	div>
 			</form>
 			<br>
 			<a class="waves-effect waves-light btn-large" id="compute"><i class="material-icons right">send</i>Chercher</a>
@@ -188,11 +210,16 @@
 		</section>
 		
 		<section id="results-section" style="display: none;">
-			<table id="spells-table">
-				<tr>
-					<th>Name</th>
-					<th>Values</th>
-				</tr>
+			<table class="responsive-table">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Values</th>
+					</tr>
+				</thead>
+				<tbody id="spells-table">
+				
+				</tbody>
 			</table>
 		</section>
 
@@ -273,19 +300,19 @@
 				var JSONdata = {};
 				if(document.getElementById('school-switch').checked == true) {
 					if($( "#school-value" ).val() != null) {
-						JSONdata = $.extend(JSONdata, {'school': $('#school-value option:selected').text()});
+						JSONdata = $.extend(JSONdata, {'school': $('#school-value option:selected').text().toLowerCase()});
 					}
 				}
 				if(document.getElementById('components-switch').checked == true) {
 					JSONdata = $.extend(JSONdata, {'component': document.getElementById('components-value option:selected').text()});
 				}
 				if(document.getElementById('level-switch').checked == true) {
-					JSONdata = $.extend(JSONdata, {'level': document.getElementById('level-value').value});
+					JSONdata = $.extend(JSONdata, { 'levels' : { 'class': $('#class-value option:selected').text().toLowerCase(), 'level' : document.getElementById('level-value').value}});
 				}
 				if(document.getElementById('range-switch').checked == true) {
 					console.log($( "#range-value" ).val());
 					if($( "#range-value" ).val() != null) {
-						JSONdata = $.extend(JSONdata, {'range': $('#range-value option:selected').text()});
+						JSONdata = $.extend(JSONdata, {'range': $('#range-value option:selected').text().toLowerCase()});
 					}
 				}
 				if(document.getElementById('resistance-switch').checked == true) {
@@ -295,6 +322,7 @@
 						JSONdata = $.extend(JSONdata, {'spellResistance': 'no'});
 					}
 				}
+				console.log(JSONdata)
                 socket.emit('compute', JSONdata);
             });
         </script>

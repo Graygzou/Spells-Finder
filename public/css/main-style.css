@@ -21,9 +21,19 @@
 	margin-right: 5%;
 }
 
+.field {
+	text-align: left;
+	margin-bottom: 30px;
+}
+
 form > label {
 	display: block;
 	text-align: left;
+}
+
+label > div {
+	float: right;
+	display: inline-block;
 }
 
 #results-section {
