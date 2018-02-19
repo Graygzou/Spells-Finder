@@ -1,7 +1,7 @@
 /**
  * @authors : Gregoire Boiron <gregoire.boiron@gmail.com>, 
 			  Theo Le Donne
- * @version : 0.1.1
+ * @version : 0.1.2
  */
 
  var mongodbModule = require('./mongodbModule');
@@ -77,14 +77,10 @@ function findSpells(i, max, dbUrl, dbName, collecName, arguments, endCallback){
 	});
 }
 
-
-// Look at that : https://docs.mongodb.com/manual/tutorial/map-reduce-examples/
-
 // --------------------------------------------------------------
 // Private functions
 // --------------------------------------------------------------
  
-// {_id:"A", value: {pagerank:1, outlink_list:["A","B","C"]} },
 /** mapSpells 
   * map function executed by MongoDB interpreter.
   */

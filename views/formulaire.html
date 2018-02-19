@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!-- 
 	@author : Grégoire Boiron <gregoire.boiron@gmail.com> 
-	@version : 1.0
+	@version : 1.2
 -->
   <html>
     <head>
@@ -60,22 +60,22 @@
 					<div class="switch">
 						<label>
 						Off
-						<input type="checkbox">
+						<input id="school-switch" type="checkbox">
 						<span class="lever"></span>
 						On
 						</label>
 					</div>
 				</label>
-				<select class="browser-default">
+				<select id="school-value" class="browser-default">
 					<option value="" disabled selected>Choose the spell's school</option>
 					<option value="1">Abjuration</option>
 					<option value="1">Conjuration</option>
 					<option value="2">Divination</option>
 					<option value="3">Enchantment</option>
-					<option value="3">Evocation</option>
-					<option value="3">Illusion</option>
-					<option value="3">Necromancy</option>
-					<option value="3">Transmutation</option>
+					<option value="4">Evocation</option>
+					<option value="5">Illusion</option>
+					<option value="6">Necromancy</option>
+					<option value="7">Transmutation</option>
 				</select>
 			
 				<label>
@@ -83,7 +83,7 @@
 					<div class="switch">
 						<label>
 						Off
-						<input type="checkbox">
+						<input id="components-switch" type="checkbox">
 						<span class="lever"></span>
 						On
 						</label>
@@ -117,14 +117,14 @@
 					<div class="switch">
 						<label>
 						Off
-						<input type="checkbox">
+						<input id="level-switch" type="checkbox">
 						<span class="lever"></span>
 						On
 						</label>
 					</div>
 				</label>
 				<p class="range-field">
-					<input type="range" id="test5" min="0" max="9" />
+					<input type="range" id="level-value" min="0" max="9" />
 				</p>
 			
 				<label>
@@ -132,21 +132,21 @@
 					<div class="switch">
 						<label>
 						Off
-						<input type="checkbox">
+						<input id="range-switch" type="checkbox">
 						<span class="lever"></span>
 						On
 						</label>
 					</div>
 				</label>
-				<select class="browser-default">
+				<select id="range-value" class="browser-default">
 					<option value="" disabled selected>Choose the spell's range</option>
 					<option value="1">Personal</option>
-					<option value="1">Touch</option>
-					<option value="2">Close</option>
-					<option value="3">Medium</option>
-					<option value="3">Long</option>
-					<option value="3">Unlimited</option>
-					<option value="3">Range Expressed in Feet</option>
+					<option value="2">Touch</option>
+					<option value="3">Close</option>
+					<option value="4">Medium</option>
+					<option value="5">Long</option>
+					<option value="6">Unlimited</option>
+					<option value="7">Range Expressed in Feet</option>
 				</select>
 				
 				<label>
@@ -154,7 +154,7 @@
 					<div class="switch">
 						<label>
 						Off
-						<input type="checkbox">
+						<input id="resistance-switch" type="checkbox">
 						<span class="lever"></span>
 						On
 						</label>
@@ -163,7 +163,7 @@
 				<div class="switch">
 					<label>
 					Non
-					<input type="checkbox">
+					<input id="resistance-value" type="checkbox">
 					<span class="lever"></span>
 					Oui
 					</label>
@@ -268,8 +268,34 @@
 			$('#compute').click(function () {
 				document.getElementById("center-section").style.display = "none";
 				document.getElementById("preloader").style.display = "block";
-			
-                socket.emit('compute', { school:'conjuration' , level:'2', component:['V'], spellResistance:'no' });
+				
+				// Retrieve data from the form
+				var JSONdata = {};
+				if(document.getElementById('school-switch').checked == true) {
+					if($( "#school-value" ).val() != null) {
+						JSONdata = $.extend(JSONdata, {'school': $('#school-value option:selected').text()});
+					}
+				}
+				if(document.getElementById('components-switch').checked == true) {
+					JSONdata = $.extend(JSONdata, {'component': document.getElementById('components-value option:selected').text()});
+				}
+				if(document.getElementById('level-switch').checked == true) {
+					JSONdata = $.extend(JSONdata, {'level': document.getElementById('level-value').value});
+				}
+				if(document.getElementById('range-switch').checked == true) {
+					console.log($( "#range-value" ).val());
+					if($( "#range-value" ).val() != null) {
+						JSONdata = $.extend(JSONdata, {'range': $('#range-value option:selected').text()});
+					}
+				}
+				if(document.getElementById('resistance-switch').checked == true) {
+					if(document.getElementById('resistance-value').checked == true) {
+						JSONdata = $.extend(JSONdata, {'spellResistance': 'yes'});
+					} else {
+						JSONdata = $.extend(JSONdata, {'spellResistance': 'no'});
+					}
+				}
+                socket.emit('compute', JSONdata);
             });
         </script>
 	</body>
