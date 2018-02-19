@@ -6,7 +6,7 @@
 // -------------------------------------
 // Import modules
 // -------------------------------------
- 
+var querystring = require('querystring');
 var http = require('http');
 var fs = require('fs');
 
@@ -59,6 +59,15 @@ app.get('/formulaire.html', function(req, res) {
     });
 });
 
+app.get('/results.html', function(req, res) {
+    res.setHeader('Content-Type', 'text/plain');
+    fs.readFile('./views/results.html', 'utf-8', function(error, content) {
+        res.writeHead(200, {"Content-Type": "text/html"});
+		console.log()
+        res.end(content);
+    });
+});
+
 app.use(function(req, res, next){
     res.setHeader('Content-Type', 'text/plain');
     res.status(404).send('Page introuvable !');
@@ -74,10 +83,10 @@ io.sockets.on('connection', function (socket) {
     socket.on('get', function (message) {
         console.log('Un client me parle ! Il me dit : ' + message);
 		
-		// Reset and Setup of MongoDB database
+		// Setup MongoDB database
 		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
 			console.log("-- Finished setup --");
-			
+			// Reset documents
 			mongodbModule.removeAllCollection(collecName, function () {
 				console.log("-- Finished removeAll --");
 			
@@ -95,29 +104,36 @@ io.sockets.on('connection', function (socket) {
 						mongodbModule.closeSpellsdb();
 						
 						// Let know the client he can step over to the next page
-						socket.emit('finish', 'Finish crawling');
+						socket.emit('finish', 'crawling');
 						
 					});
 				});
 			});
 		});
     });
+	
 	// "compute" means appling the map reduce algorithm to find a list of spells.
 	socket.on('compute', function (message) {
         console.log('Un client me parle ! Il me dit : ' + message);
-
-		mongodbModule.getAllDocuments(collecName, function (results) {
-			//console.log(results);
+		
+		// Setup MongoDB database
+		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
+			console.log("-- Finished setup --");
 			
-			// Call the mapReduce function created for spells.
-			var spellArgument = {school: 'conjuration', level: 2, components: ['V', 'S'], SpellResistance: 'no'};
+			mongodbModule.getAllDocuments(collecName, function (results) {
+				console.log(results);
 			
-			mapReduceModule.findSpells(0, 1, dbUrl, dbName, collecName, spellArgument, function end() {
-				console.log("End map reduce");
-				db.close;
+				// Call the mapReduce function created for spells.
+				var spellArgument = {school: 'conjuration', level: 2, components: ['V', 'S'], SpellResistance: 'no'};
+				
+				mapReduceModule.findSpells(0, 1, dbUrl, dbName, collecName, spellArgument, function (results) {
+					console.log(results);
+					
+					// Let know the client he can print the results
+					socket.emit('results', results);
+				});
 			});
 		});
-		
     });	
 });
 

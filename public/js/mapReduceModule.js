@@ -71,7 +71,7 @@ function findSpells(i, max, dbUrl, dbName, collecName, arguments, endCallback){
 	
 		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, function (result) {
 			console.log("-- MapReduce finished --");
-			console.log(result);
+			endCallback(result);
 		});
 
 	});
@@ -200,7 +200,7 @@ var reduceSpells = function(key, values){
 	
 	for (var i = 0; i < values.length; i++){
 		reducedVal.names[i] = values[i].name
-	}s
+	}
 
 	print("Full object de ", reducedVal);
 	//print(tojson(full));

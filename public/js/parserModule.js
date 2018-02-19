@@ -1,5 +1,5 @@
 /**
- * @author : Gr�goire Boiron <gregoire.boiron@gmail.com>
+ * @author : Grégoire Boiron <gregoire.boiron@gmail.com>
  * @version : 0.1.0
  */
 

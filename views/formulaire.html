@@ -33,7 +33,7 @@
 		
 		<nav class="padding-left">
 			<div class="nav-wrapper">
-			  <div class="col s12">
+			  <div id="navigation-bar" class="col s12">
 				<a href="index.html" class="breadcrumb">Introduction</a>
 				<a href="#!" class="breadcrumb">Criteres</a>
 				<!--
@@ -172,6 +172,29 @@
 			<br>
 			<a class="waves-effect waves-light btn-large" id="compute"><i class="material-icons right">send</i>Chercher</a>
 		</section>
+		
+		<section id="preloader" style="display: none;">
+			<div class="preloader-wrapper big active">
+				<div class="spinner-layer spinner-blue-only">
+					<div class="circle-clipper left">
+						<div class="circle"></div>
+					</div><div class="gap-patch">
+						<div class="circle"></div>
+					</div><div class="circle-clipper right">
+					<div class="circle"></div>
+					</div>
+				</div>
+			</div>
+		</section>
+		
+		<section id="results-section" style="display: none;">
+			<table id="spells-table">
+				<tr>
+					<th>Name</th>
+					<th>Values</th>
+				</tr>
+			</table>
+		</section>
 
 		<footer class="page-footer">
           <div class="container">
@@ -197,14 +220,55 @@
           </div>
         </footer>
 		
-      <!--Import jQuery before materialize.js-->
-      <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-		<script src="/socket.io/socket.io.js"></script>
+		<!--Import jQuery before materialize.js-->
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+		<script src="socket.io/socket.io.js"></script>
 		<script>
-            var socket = io.connect('http://localhost:8080');
+            var socket = io.connect("http://localhost:8080");
+			
+			socket.on('results', function(jsonObj) {
+				console.log(jsonObj);
+				// Disable loading screen
+				document.getElementById("preloader").style.display = "none";
+				var container = document.getElementById("results-section");
+			
+				// Change page style
+				var node = document.createElement('a');
+				var textnode = document.createTextNode("Resultats");
+				node.className += "breadcrumb";
+				node.appendChild(textnode);
+				document.getElementById("navigation-bar").appendChild(node);
+				
+				// Add results
+				for(var spell in jsonObj) {
+					console.log(jsonObj[spell]);
+					
+					var currentTR = document.createElement("tr");
+					//currentTR.setAttribute("id", "myTr");
+					document.getElementById("spells-table").appendChild(currentTR);
+					
+					for (var key in jsonObj[spell]) {
+						if (jsonObj[spell].hasOwnProperty(key)) {
+							console.log(key + " -> " + jsonObj[spell][key]);
+							//container.innerHTML += key + " -> " + ;
+							
+							var currentTD = document.createElement("td");
+							var text = document.createTextNode(jsonObj[spell][key]);
+							currentTD.appendChild(text);
+							currentTR.appendChild(currentTD);
+						}
+					}
+				}
+			
+				container.style.display = "block";
+				
+			});
 			
 			$('#compute').click(function () {
+				document.getElementById("center-section").style.display = "none";
+				document.getElementById("preloader").style.display = "block";
+			
                 socket.emit('compute', { school:'conjuration' , level:'2', component:['V'], spellResistance:'no' });
             });
         </script>

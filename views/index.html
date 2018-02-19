@@ -35,9 +35,6 @@
 			<div class="nav-wrapper">
 			  <div class="col s12">
 				<a href="#!" class="breadcrumb">Introduction</a>
-				<!--
-				<a href="#!" class="breadcrumb">Second</a>
-				<a href="#!" class="breadcrumb">Third</a>-->
 			  </div>
 			</div>
 		</nav>
@@ -163,7 +160,7 @@
 		
 		socket.on('finish', function(message) {
 			window.location.href = "formulaire.html";
-		})
+		});
 
 		$('#next').click(function () {
 			document.getElementById("center-section").style.display = "none";

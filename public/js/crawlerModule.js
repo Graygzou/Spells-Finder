@@ -9,7 +9,7 @@ const Crawler = require('crawler');
 const fs = require('fs');
 
 // Import custom modules
-var parserModule = require('./parser');
+var parserModule = require('./parserModule');
 
 // Database variables
 const dbUrl = 'mongodb://localhost:27017/';

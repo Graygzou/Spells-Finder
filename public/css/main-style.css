@@ -25,3 +25,12 @@ form > label {
 	display: block;
 	text-align: left;
 }
+
+#results-section {
+	padding-left: 100px;
+	padding-right: 100px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
