@@ -30,36 +30,11 @@ var openSpellsdb = function() {
  * Function that close the db
  */
 var createSpellsdb = function() {
+	// Retrieve the .sql file that create sqlite tables
+	var sqlCreateTables = fs.readFileSync('init-spell-database.sql').toString();
+	
 	db.serialize(function() {
-		// Create basic tables
-		db.run(`CREATE TABLE Class (name TEXT PRIMARY KEY)`);
-		db.run(`CREATE TABLE Spell (name TEXT, 
-									description TEXT, 
-									provideResistance INT,
-									isVerbose INT ,
-									isSomatic INT,
-									CHECK (provideResistance IN (0, 1)),
-									CHECK (isVerbose IN (0, 1)),
-									CHECK (isSomatic IN (0, 1)),
-									PRIMARY KEY (name))`);
-		db.run(`CREATE TABLE School (name TEXT, description TEXT)`);
-		db.run(`CREATE TABLE Ingredients (name TEXT PRIMARY KEY, description TEXT)`);
-		
-		// Create "joining tables"
-		db.run(`CREATE TABLE Use (level INT,
-								 class_name TEXT,
-								 spell_name TEXT,
-								 FOREIGN KEY (class_name) REFERENCES Class (name),
-								 FOREIGN KEY (spell_name) REFERENCES Spell (name),
-								 PRIMARY KEY (class_name, spell_name),
-								 CHECK (level >= 0 AND level < 10))`);
-		db.run(`CREATE TABLE Need (type TEXT,
-								  cost INT,
-								  ingredient_name TEXT,
-								  spell_name TEXT,
-								  FOREIGN KEY (ingredient_name) REFERENCES Ingredients (name),
-								  FOREIGN KEY (spell_name) REFERENCES Spell (id),
-								  PRIMARY KEY (ingredient_name, spell_name))`);
+		db.run(sqlCreateTables);
 	});
 	isDatabaseCreated = true;
 	console.log("database created");
@@ -98,7 +73,7 @@ var insertSpell = function(jsondata){
 var getSpecificSpell = function(maxLevel, isVerbose, isSomatic, provideResistance, materials) {
 	if(isDatabaseCreated) {
 		db.serialize(function() {
-			db.each("SELECT rowid AS id, name FROM Spell WHERE" +
+			db.each("SELECT * FROM Spell WHERE" +
 							"provideResistance = " + provideResistance +
 							"isVerbal = " + isVerbose +
 							"isSomatic = " + isSomatic +
