@@ -179,7 +179,17 @@ var checkComponents = function(currentSpellComponents, givenComponents) {
 				if(spellClass.indexOf(givenComponents["levels"]["class"]) != -1 && spellLevel <= givenComponents["levels"]["level"]) {
 					equals = true;
 				}
+				
 			}
+		} 
+		//TODO
+		else if (key == "components") {
+			equals = false;
+			for (components in currentSpellComponents[key] ) {
+				
+			}
+
+			
 		} else {
 			equals = equals && givenComponents[key] == currentSpellComponents[key];
 		}
