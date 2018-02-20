@@ -28,7 +28,7 @@ app.use(express.static(__dirname + '/public'));
 var crawlerModule = require('./public/js/crawlerModule');
 var mapReduceModule = require('./public/js/mapReduceModule');
 var mongodbModule = require('./public/js/mongodbModule');
-var sqlite = require('./public/js/sqliteModule');
+var sqliteModule = require('./public/js/sqliteModule');
 
 
 // Database variables
@@ -44,8 +44,6 @@ const collecName = 'spells';				// Collection name
 app.get('/', function(req, res) {
     res.setHeader('Content-Type', 'text/plain');
 	fs.readFile('./views/index.html', 'utf-8', function(error, content) {
-		sqlite.openSpellsdb();
-		sqlite.closeSpellsdb();
         res.writeHead(200, {"Content-Type": "text/html"});
         res.end(content);
     });
@@ -94,13 +92,21 @@ io.sockets.on('connection', function (socket) {
 		
 		// Setup MongoDB database
 		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
-			console.log("-- Finished setup --");
+			console.log("-- Finished setup MongoDB --");
+			
+			// Setup SQlite database
+			sqliteModule.setupSpellsDB();
+			
 			// Reset documents
 			mongodbModule.removeAllCollection(collecName, function () {
-				console.log("-- Finished removeAll --");
+				console.log("-- Finished removeAll MongoDB --");
 			
+				// Initialise School and UserClass tables of SQlite database
+				sqliteModule.initSpellsDB();
+				console.log("-- Finished removeAll MongoDB --");
+				
 				mongodbModule.createCollections(collecName, function () {
-					console.log("-- Finished createCollection --");
+					console.log("-- Finished createCollection MongoDB --");
 					
 					// Start the crawling algorithm
 					startCrawler(message['url'], message['maxPage'], function () {
@@ -110,7 +116,9 @@ io.sockets.on('connection', function (socket) {
 						
 						//getSpecificSpell();
 						
+						// close BDDs
 						mongodbModule.closeSpellsdb();
+						sqliteModule.closeSpellsDB();
 						
 						// Let know the client he can step over to the next page
 						socket.emit('finish', 'crawling');
@@ -127,7 +135,7 @@ io.sockets.on('connection', function (socket) {
 		
 		// Setup MongoDB database
 		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
-			console.log("-- Finished setup --");
+			console.log("-- Finished setup MongoDB --");
 			
 			mongodbModule.getAllDocuments(collecName, function (results) {
 
@@ -155,11 +163,15 @@ var startCrawler = function(url, maxPages, endCallback) {
 	//var maxNumber = 5;
 	//var url = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=";
 	for(var id = 1; id <= maxPages; id++) {
-		crawlerModule.webScraper(url, id, insertMongoCallback, maxPages, endCallback);
+		crawlerModule.webScraper(url, id, insertBDDsCallback, maxPages, endCallback);
 	}
 }
 
-var insertMongoCallback = function(jsonData) {
+var insertBDDsCallback = function(jsonData) {
+	// Insert the json into MongoDB
 	mongodbModule.insertSpell(collecName, jsonData);
-	console.log("1 document inserted");
+	console.log("1 document inserted into MongoDB");
+	
+	// Insert into sqlite database
+	//sqliteModule.insertSpell(jsonData);
 }

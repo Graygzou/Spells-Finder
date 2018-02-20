@@ -5,39 +5,93 @@
  
 // import the specific package
 var sqlite3 = require('sqlite3').verbose();
+var fs = require('fs');
 
 // Global variables used by the module
 var db;
 var isDatabaseCreated = false;
 
 /**
- * Open the database in memory
+ * Basic setup of the sqlite bdd.
  */
-var openSpellsdb = function() {
-	db = new sqlite3.Database(':memory:', (err) => {
+var setupSpellsDB = function() {
+	// if the database does not exist, the new database will be created 
+	// and is ready for read and write.
+	db = new sqlite3.Database('./sqlite/spells.db', sqlite3.OPEN_CREATE|sqlite3.OPEN_READWRITE, (err) => {
 		if (err) {
 			return console.error(err.message);
 		}
-		console.log('Connected to the in-memory SQlite database.');
+		console.log('Connected to the spell SQlite database.');
+		// Create the SQL schema.
+		createSpellsDB();
 	});
 }
-
 
 //SELECT rowid, * FROM 'Class';
 //INSERT INTO Class (name) VALUES ('druid')
 
 /**
- * Function that close the db
+ * 
  */
-var createSpellsdb = function() {
+var createSpellsDB = function() {
 	// Retrieve the .sql file that create sqlite tables
-	var sqlCreateTables = fs.readFileSync('init-spell-database.sql').toString();
+	//var createTableFile = fs.readFileSync('').toString();
 	
-	db.serialize(function() {
-		db.run(sqlCreateTables);
-	});
-	isDatabaseCreated = true;
-	console.log("database created");
+	fs.readFile('./sqlite/queries/init-spell-database.sql', 'utf8', function (err, data) {
+		if (err) throw err;
+		db.exec(data, function (err) {
+			if (err) throw err;
+			// Update the lock variable
+			isDatabaseCreated = true;
+			console.log("Database created.");
+		});
+    });
+	
+	
+}
+
+var initSpellsDB = function() {
+	if(isDatabaseCreated) {
+		db.serialize(function() {
+			// Insert School values.
+			schools = [
+				{ name : 'Abjuration', 	desc : '' },
+				{ name : 'Conjuration', desc : '' },
+				{ name : 'Divination', 	desc : '' },
+				{ name : 'Enchantment', desc : '' },
+				{ name : 'Evocation', 	desc : '' },
+				{ name : 'Illusion', 	desc : '' },
+				{ name : 'Necromancy', 	desc : '' },
+				{ name : 'Transmutation', desc : '' }
+			];
+			var stmt = db.prepare("INSERT INTO School VALUES (NULL, ?, ?)");
+			for (var i = 0; i < 10; i++) {
+				stmt.run([schools['name'], schools['desc']]);
+			}
+			stmt.finalize();
+			// Insert Classes values.
+			classes = [
+				{ name : 'Bard', 	desc : '' },
+				{ name : 'Cleric', 	desc : '' },
+				{ name : 'Druid', 	desc : '' },
+				{ name : 'Fighter', desc : '' },
+				{ name : 'Monk', 	desc : '' },
+				{ name : 'Paladin', desc : '' },
+				{ name : 'Ranger', 	desc : '' },
+				{ name : 'Rogue', 	desc : '' },
+				{ name : 'Sorcerer', desc : '' },
+				{ name : 'Wizard', 	desc : '' }
+			];
+			// Insert Class values.
+			stmt = db.prepare("INSERT INTO UserClass VALUES (NULL, ?, ?)");
+			for (var i = 0; i < 10; i++) {
+				stmt.run([classes['name'], classes['desc']]);
+			}
+			stmt.finalize();
+		});
+	} else {
+		console.log("call createSpellsdb before this operation");
+	}
 }
 
 /** Function that let insert in the database.
@@ -70,14 +124,13 @@ var insertSpell = function(jsondata){
  * @param {bool} provideResistance - 1 if it grants spell resistance, 0 otherwise.
  * @param {array} materials - arrays of string that contains materials needed
  */
-var getSpecificSpell = function(maxLevel, isVerbose, isSomatic, provideResistance, materials) {
+var getSpecificSpell = function(Userclass, maxLevel, isVerbose, isSomatic, provideResistance, materials) {
 	if(isDatabaseCreated) {
+		
+		var getQueryFile = fs.readFileSync('get-spell.sql').toString();
+		
 		db.serialize(function() {
-			db.each("SELECT * FROM Spell WHERE" +
-							"provideResistance = " + provideResistance +
-							"isVerbal = " + isVerbose +
-							"isSomatic = " + isSomatic +
-			"", function(err, row) {
+			db.each(getQueryFile, [Userclass, provideResistance, isVerbose, isSomatic], function(err, row) {
 				console.log(row.id + ": " + row.name);
 				// return the name of spells that match the request parameters
 				return row;
@@ -93,7 +146,7 @@ var getSpecificSpell = function(maxLevel, isVerbose, isSomatic, provideResistanc
 /**
  * Function that close the current database
  */
-var closeSpellsdb = function() {
+var closeSpellsDB = function() {
 	db.close((err) => {
 		if (err) {
 			return console.error(err.message);
@@ -103,9 +156,9 @@ var closeSpellsdb = function() {
 }
 
 // Export module functions
-exports.openSpellsdb 		= openSpellsdb;
-exports.createSpellsdb 		= createSpellsdb;
+exports.setupSpellsDB 		= setupSpellsDB;
+exports.initSpellsDB		= initSpellsDB;
 exports.insertSpell 		= insertSpell;
 exports.getSpecificSpell 	= getSpecificSpell;
-exports.closeSpellsdb 		= closeSpellsdb;
+exports.closeSpellsDB 		= closeSpellsDB;
  
