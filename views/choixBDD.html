@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<!-- 
+	@author : Grégoire Boiron <gregoire.boiron@gmail.com> 
+	@version : 1.2
+-->
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css-->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+	  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	  
+	  <!-- Include stylesheets -->
+	  <link rel="stylesheet" type="text/css" href="css/main-style.css">	
+    </head>
+	
+	<!-- https://docs.google.com/spreadsheets/d/1cuwb3QSvWDD7GG5McdvyyRBpqycYuKMRsXgyrvxvLFI/htmlembed -->
+
+    <body>
+		<nav>
+		  <div class="nav-wrapper padding-left">
+			<a href="" class="brand-logo">Spell Finder - Match the perfect spell</a>
+			<ul id="nav-mobile" class="right hide-on-med-and-down">
+			  <li><a href="">A propos</a></li>
+			  <!--<li><a href="">sass <span class="new badge">4</span></a></li>
+			  <li><a href="">sass</a></li>-->
+			</ul>
+		  </div>
+		</nav>
+		
+		<nav class="padding-left">
+			<div class="nav-wrapper">
+			  <div id="navigation-bar" class="col s12">
+				<a href="index.html" class="breadcrumb">Introduction</a>
+				<a href="#!" class="breadcrumb">Base de données</a>
+			  </div>
+			</div>
+		</nav>
+		
+		<section id="center-section">
+			<h1>Choix de la base de données</h1>
+			
+			<p>
+				Veuillez choisir la base de données qui va être utilisée.
+				<br>
+				Veuillez aussi renseigner le nombre de sorts récuperées pour cette page.
+			</p>
+			
+			<form action="#">
+				<!-- BDD field -->
+				<div class="field">
+					<label>
+						Base de données disponibles
+					</label>
+					<select id="bdd-value" class="browser-default">
+						<option value="1">http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=</option>
+					</select>
+				</div>
+				<div class="field">
+					<!-- Number of pages  -->
+					<label>
+						Nombre de pages 
+					</label>
+					<p class="range-field">
+						<input type="range" id="page-value" min="1" max="1975" />
+					</p>
+				</div>
+			</form>
+			<br>
+			<a class="waves-effect waves-light btn-large" id="next"><i class="material-icons right">send</i>Crawler</a>
+		</section>
+		
+		<section id="preloader" style="display: none;">
+			<div class="preloader-wrapper big active">
+				<div class="spinner-layer spinner-blue-only">
+					<div class="circle-clipper left">
+						<div class="circle"></div>
+					</div><div class="gap-patch">
+						<div class="circle"></div>
+					</div><div class="circle-clipper right">
+					<div class="circle"></div>
+					</div>
+				</div>
+			</div>
+		</section>
+		
+		<section id="results-section" style="display: none;">
+			<table class="responsive-table">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>School</th>
+						<th>Level</th>
+						<th>Components</th>
+						<th>Range</th>
+						<th>Spell Resistance</th>
+					</tr>
+				</thead>
+				<tbody id="spells-table">
+				
+				</tbody>
+			</table>
+		</section>
+
+		<footer class="page-footer">
+          <div class="container">
+            <div class="row">
+              <div class="col l6 s12">
+                <h5 class="white-text">Objectifs</h5>
+                <p class="grey-text text-lighten-4">Ce site a été réalisé dans le cadre d'un cours dispensé à l'UQAC. Ce site à donc été fait à des fins pédagogiques.</p>
+              </div>
+              <div class="col l4 offset-l2 s12">
+                <h5 class="white-text">Liens</h5>
+                <ul>
+                  <li><a class="grey-text text-lighten-3" href="http://www.uqac.ca">UQAC</a></li>
+                  <li><a class="grey-text text-lighten-3" href="https://github.com/edmondlachance/8INF803">GitHub du cours</a></li>
+                  <li><a class="grey-text text-lighten-3" href="https://github.com/Graygzou/Spells-Finder">GitHub du projet</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="footer-copyright">
+            <div class="container">
+            © 2018 Copyright
+            </div>
+          </div>
+        </footer>
+		
+		<!--Import jQuery before materialize.js-->
+		<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+		<script src="socket.io/socket.io.js"></script>
+		<script>
+            var socket = io.connect('http://localhost:8080');
+		
+			socket.on('finish', function(message) {
+				window.location.href = "formulaire.html";
+			});
+
+			$('#next').click(function () {
+				document.getElementById("center-section").style.display = "none";
+				document.getElementById("preloader").style.display = "block";
+				
+				socket.emit('get', { 'url' : $('#bdd-value option:selected').text().toLowerCase(), 'maxPage' : document.getElementById('page-value').value});
+			});
+        </script>
+	</body>
+  </html>
+        

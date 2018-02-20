@@ -68,6 +68,15 @@ app.get('/results.html', function(req, res) {
     });
 });
 
+app.get('/choixBDD.html', function(req, res) {
+    res.setHeader('Content-Type', 'text/plain');
+    fs.readFile('./views/choixBDD.html', 'utf-8', function(error, content) {
+        res.writeHead(200, {"Content-Type": "text/html"});
+		console.log()
+        res.end(content);
+    });
+});
+
 app.use(function(req, res, next){
     res.setHeader('Content-Type', 'text/plain');
     res.status(404).send('Page introuvable !');

@@ -42,7 +42,7 @@
 	<section id="center-section">
 		<h1>Trouvez le sort qui vous correspond ! </h1>
 	
-		<a class="waves-effect waves-light btn-large" id="next" href="#"><i class="material-icons right">send</i>Démarrer</a>
+		<a class="waves-effect waves-light btn-large" id="next" href="choixBDD.html"><i class="material-icons right">send</i>Démarrer</a>
 		
 		
 		<div class="section">
@@ -154,21 +154,6 @@
 	<!--Import jQuery before materialize.js-->
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-	<script src="/socket.io/socket.io.js"></script>
-	<script>
-		var socket = io.connect('http://localhost:8080');
-		
-		socket.on('finish', function(message) {
-			window.location.href = "formulaire.html";
-		});
-
-		$('#next').click(function () {
-			document.getElementById("center-section").style.display = "none";
-			document.getElementById("preloader").style.display = "block";
-			
-			socket.emit('get', 'http://google.com');
-		});
-	</script>
 	</body>
   </html>
         
