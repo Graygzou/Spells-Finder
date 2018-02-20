@@ -90,7 +90,7 @@ app.use(function(req, res, next){
 io.sockets.on('connection', function (socket) {
     // "get" means scraping all the webpage of spells. 
     socket.on('get', function (message) {
-        console.log('Un client me parle ! Il me dit : ' + message);
+        console.log('Un client me parle ! Il me dit : ' + message['url'] + message['maxPage']);
 		
 		// Setup MongoDB database
 		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
@@ -103,7 +103,7 @@ io.sockets.on('connection', function (socket) {
 					console.log("-- Finished createCollection --");
 					
 					// Start the crawling algorithm
-					startCrawler(function () {
+					startCrawler(message['url'], message['maxPage'], function () {
 						
 						
 						console.log("-- Finish crawling --");
@@ -149,13 +149,13 @@ io.sockets.on('connection', function (socket) {
 // Private functions
 // -------------------------------------	
 
-var startCrawler = function(endCallback) {
+var startCrawler = function(url, maxPages, endCallback) {
 	
 	//var maxNumber = 1975;
-	var maxNumber = 5;
-	var url = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=";
-	for(var id = 1; id <= maxNumber; id++) {
-		crawlerModule.webScraper(url, id, insertMongoCallback, maxNumber, endCallback);
+	//var maxNumber = 5;
+	//var url = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=";
+	for(var id = 1; id <= maxPages; id++) {
+		crawlerModule.webScraper(url, id, insertMongoCallback, maxPages, endCallback);
 	}
 }
 

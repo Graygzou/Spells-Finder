@@ -87,24 +87,6 @@
 			</div>
 		</section>
 		
-		<section id="results-section" style="display: none;">
-			<table class="responsive-table">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>School</th>
-						<th>Level</th>
-						<th>Components</th>
-						<th>Range</th>
-						<th>Spell Resistance</th>
-					</tr>
-				</thead>
-				<tbody id="spells-table">
-				
-				</tbody>
-			</table>
-		</section>
-
 		<footer class="page-footer">
           <div class="container">
             <div class="row">
@@ -144,7 +126,10 @@
 				document.getElementById("center-section").style.display = "none";
 				document.getElementById("preloader").style.display = "block";
 				
-				socket.emit('get', { 'url' : $('#bdd-value option:selected').text().toLowerCase(), 'maxPage' : document.getElementById('page-value').value});
+				var url = $('#bdd-value option:selected').text().toLowerCase();
+				var maxPage = document.getElementById('page-value').value;
+				
+				socket.emit('get', { 'url' : url, 'maxPage' : maxPage});
 			});
         </script>
 	</body>
