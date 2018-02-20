@@ -95,34 +95,36 @@ io.sockets.on('connection', function (socket) {
 			console.log("-- Finished setup MongoDB --");
 			
 			// Setup SQlite database
-			sqliteModule.setupSpellsDB();
-			
-			// Reset documents
-			mongodbModule.removeAllCollection(collecName, function () {
-				console.log("-- Finished removeAll MongoDB --");
-			
-				// Initialise School and UserClass tables of SQlite database
-				sqliteModule.initSpellsDB();
-				console.log("-- Finished removeAll MongoDB --");
+			sqliteModule.setupSpellsDB( function () {
+				console.log("-- Finished setup sqlite --");
 				
-				mongodbModule.createCollections(collecName, function () {
-					console.log("-- Finished createCollection MongoDB --");
-					
-					// Start the crawling algorithm
-					startCrawler(message['url'], message['maxPage'], function () {
+				// Reset documents
+				mongodbModule.removeAllCollection(collecName, function () {
+					console.log("-- Finished removeAll MongoDB --");
+				
+					// Initialise School and UserClass tables of SQlite database
+					sqliteModule.initSpellsDB(function () {
+						console.log("-- Finished initialize sqlite --");
 						
-						
-						console.log("-- Finish crawling --");
-						
-						//getSpecificSpell();
-						
-						// close BDDs
-						mongodbModule.closeSpellsdb();
-						sqliteModule.closeSpellsDB();
-						
-						// Let know the client he can step over to the next page
-						socket.emit('finish', 'crawling');
-						
+						mongodbModule.createCollections(collecName, function () {
+							console.log("-- Finished createCollection MongoDB --");
+							
+							// Start the crawling algorithm
+							startCrawler(message['url'], message['maxPage'], function () {
+								
+								console.log("-- Finish crawling --");
+								
+								//getSpecificSpell();
+								
+								// close BDDs
+								mongodbModule.closeSpellsdb();
+								sqliteModule.closeSpellsDB();
+								
+								// Let know the client he can step over to the next page
+								socket.emit('finish', 'crawling');
+								
+							});
+						});
 					});
 				});
 			});

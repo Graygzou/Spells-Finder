@@ -9,12 +9,11 @@ var fs = require('fs');
 
 // Global variables used by the module
 var db;
-var isDatabaseCreated = false;
 
 /**
  * Basic setup of the sqlite bdd.
  */
-var setupSpellsDB = function() {
+var setupSpellsDB = function(endCallback) {
 	// if the database does not exist, the new database will be created 
 	// and is ready for read and write.
 	db = new sqlite3.Database('./sqlite/spells.db', sqlite3.OPEN_CREATE|sqlite3.OPEN_READWRITE, (err) => {
@@ -23,7 +22,7 @@ var setupSpellsDB = function() {
 		}
 		console.log('Connected to the spell SQlite database.');
 		// Create the SQL schema.
-		createSpellsDB();
+		createSpellsDB(endCallback);
 	});
 }
 
@@ -33,7 +32,7 @@ var setupSpellsDB = function() {
 /**
  * 
  */
-var createSpellsDB = function() {
+var createSpellsDB = function(endCallback) {
 	// Retrieve the .sql file that create sqlite tables
 	//var createTableFile = fs.readFileSync('').toString();
 	
@@ -41,78 +40,69 @@ var createSpellsDB = function() {
 		if (err) throw err;
 		db.exec(data, function (err) {
 			if (err) throw err;
-			// Update the lock variable
-			isDatabaseCreated = true;
 			console.log("Database created.");
+			endCallback();
 		});
     });
-	
-	
 }
 
-var initSpellsDB = function() {
-	if(isDatabaseCreated) {
-		db.serialize(function() {
-			// Insert School values.
-			schools = [
-				{ name : 'Abjuration', 	desc : '' },
-				{ name : 'Conjuration', desc : '' },
-				{ name : 'Divination', 	desc : '' },
-				{ name : 'Enchantment', desc : '' },
-				{ name : 'Evocation', 	desc : '' },
-				{ name : 'Illusion', 	desc : '' },
-				{ name : 'Necromancy', 	desc : '' },
-				{ name : 'Transmutation', desc : '' }
-			];
-			var stmt = db.prepare("INSERT INTO School VALUES (NULL, ?, ?)");
-			for (var i = 0; i < 10; i++) {
-				stmt.run([schools['name'], schools['desc']]);
-			}
-			stmt.finalize();
-			// Insert Classes values.
-			classes = [
-				{ name : 'Bard', 	desc : '' },
-				{ name : 'Cleric', 	desc : '' },
-				{ name : 'Druid', 	desc : '' },
-				{ name : 'Fighter', desc : '' },
-				{ name : 'Monk', 	desc : '' },
-				{ name : 'Paladin', desc : '' },
-				{ name : 'Ranger', 	desc : '' },
-				{ name : 'Rogue', 	desc : '' },
-				{ name : 'Sorcerer', desc : '' },
-				{ name : 'Wizard', 	desc : '' }
-			];
-			// Insert Class values.
-			stmt = db.prepare("INSERT INTO UserClass VALUES (NULL, ?, ?)");
-			for (var i = 0; i < 10; i++) {
-				stmt.run([classes['name'], classes['desc']]);
-			}
-			stmt.finalize();
-		});
-	} else {
-		console.log("call createSpellsdb before this operation");
-	}
+/** initSpellsDB
+ * Initialize tables that don't need the spells crawler.
+ */
+var initSpellsDB = function(endCallback) {
+	db.serialize(function() {
+		// Insert School values.
+		schools = [
+			{ name : 'Abjuration', 	desc : '' },
+			{ name : 'Conjuration', desc : '' },
+			{ name : 'Divination', 	desc : '' },
+			{ name : 'Enchantment', desc : '' },
+			{ name : 'Evocation', 	desc : '' },
+			{ name : 'Illusion', 	desc : '' },
+			{ name : 'Necromancy', 	desc : '' },
+			{ name : 'Transmutation', desc : '' }
+		];
+		var insertQuery1 = db.prepare("INSERT INTO School VALUES (NULL, ?, ?)");
+		for (var i = 0; i < schools.length; i++) {
+			insertQuery1.run([schools[i]['name'], schools[i]['desc']]);
+		}
+		insertQuery1.finalize();
+		// Insert Classes values.
+		classes = [
+			{ name : 'Bard', 	desc : '' },
+			{ name : 'Cleric', 	desc : '' },
+			{ name : 'Druid', 	desc : '' },
+			{ name : 'Fighter', desc : '' },
+			{ name : 'Monk', 	desc : '' },
+			{ name : 'Paladin', desc : '' },
+			{ name : 'Ranger', 	desc : '' },
+			{ name : 'Rogue', 	desc : '' },
+			{ name : 'Sorcerer', desc : '' },
+			{ name : 'Wizard', 	desc : '' }
+		];
+		// Insert Class values.
+		var insertQuery2 = db.prepare("INSERT INTO UserClass VALUES (NULL, ?, ?)");
+		for (var i = 0; i < classes.length; i++) {
+			insertQuery2.run([classes[i]['name'], classes[i]['desc']]);
+		}
+		insertQuery2.finalize();
+		endCallback();
+	});
 }
 
 /** Function that let insert in the database.
  * @param {object} jsondata - json file containing data.
  */
-var insertSpell = function(jsondata){
-	if(isDatabaseCreated) {
+var insertSpell = function(jsondata) {
+	// Call the parser maybe here ?
+	db.serialize(function() {
+		var stmt = db.prepare("INSERT INTO lorem VALUES (?)");
+		for (var i = 0; i < 10; i++) {
+			stmt.run("Ipsum " + i);
+		}
+		stmt.finalize();
 		
-		// Call the parser maybe here ?
-		
-		db.serialize(function() {
-			var stmt = db.prepare("INSERT INTO lorem VALUES (?)");
-			for (var i = 0; i < 10; i++) {
-				stmt.run("Ipsum " + i);
-			}
-			stmt.finalize();
-			
-		});
-	} else {
-		console.log("call createSpellsdb before this operation");
-	}
+	});
 }
 
 
@@ -125,21 +115,15 @@ var insertSpell = function(jsondata){
  * @param {array} materials - arrays of string that contains materials needed
  */
 var getSpecificSpell = function(Userclass, maxLevel, isVerbose, isSomatic, provideResistance, materials) {
-	if(isDatabaseCreated) {
-		
-		var getQueryFile = fs.readFileSync('get-spell.sql').toString();
-		
-		db.serialize(function() {
-			db.each(getQueryFile, [Userclass, provideResistance, isVerbose, isSomatic], function(err, row) {
-				console.log(row.id + ": " + row.name);
-				// return the name of spells that match the request parameters
-				return row;
-			});
+	var getQueryFile = fs.readFileSync('get-spell.sql').toString();
+	
+	db.serialize(function() {
+		db.each(getQueryFile, [Userclass, provideResistance, isVerbose, isSomatic], function(err, row) {
+			console.log(row.id + ": " + row.name);
+			// return the name of spells that match the request parameters
+			return row;
 		});
-	} else {
-		console.log("call createSpellsdb before this operation");
-		return null;
-	}
+	});
 }
 
 
