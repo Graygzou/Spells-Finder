@@ -12,16 +12,14 @@ DROP TABLE IF EXISTS Need;
 
 -- Class table (Cleric, Wizard, ...)
 CREATE TABLE IF NOT EXISTS UserClass (
-	class_id INTEGER PRIMARY KEY,
-	name TEXT NOT NULL,
+	class_name TEXT PRIMARY KEY,
 	description TEXT
 );
 
 -- Spell table
 CREATE TABLE IF NOT EXISTS Spell (
-	spell_id INTEGER PRIMARY KEY,
-	school_id INTEGER,
-	name TEXT, 
+	spell_name TEXT PRIMARY KEY,
+	school_name TEXT,
 	description TEXT, 
 	provideResistance INTEGER,
 	isVerbose INTEGER,
@@ -29,12 +27,11 @@ CREATE TABLE IF NOT EXISTS Spell (
 	CHECK (provideResistance IN (0, 1)),
 	CHECK (isVerbose IN (0, 1)),
 	CHECK (isSomatic IN (0, 1)),
-	FOREIGN KEY (school_id) REFERENCES School (school_id)
+	FOREIGN KEY (school_name) REFERENCES School (school_name)
 );
 
 CREATE TABLE IF NOT EXISTS School (
-	school_id INTEGER PRIMARY KEY,
-	name TEXT NOT NULL, 
+	school_name TEXT PRIMARY KEY,
 	description TEXT
 );
 
@@ -46,21 +43,21 @@ CREATE TABLE IF NOT EXISTS Ingredient (
 
 -- Create "joining tables"
 CREATE TABLE IF NOT EXISTS Invoque (
-	class_id TEXT,
-	spell_id INTEGER,
+	class_name TEXT,
+	spell_name TEXT,
 	spellLevel INTEGER,
-	FOREIGN KEY (class_id) REFERENCES UserClass (class_id),
-	FOREIGN KEY (spell_id) REFERENCES Spell (spell_id),
+	FOREIGN KEY (class_name) REFERENCES UserClass (class_name),
+	FOREIGN KEY (spell_name) REFERENCES Spell (spell_name),
 	CHECK (spellLevel >= 0 AND spellLevel < 10),
-	PRIMARY KEY (class_id, spell_id)
+	PRIMARY KEY (class_name, spell_name, spellLevel)
 );
 					
 CREATE TABLE IF NOT EXISTS Need (
 	indregient_type TEXT,
 	cost INTEGER,
-	ingredient_id TEXT,
-	spell_id TEXT,
+	ingredient_id INTEGER,
+	spell_name TEXT,
 	FOREIGN KEY (ingredient_id) REFERENCES Ingredients (ingredient_id),
-	FOREIGN KEY (spell_id) REFERENCES Spell (spell_id),
-	PRIMARY KEY (ingredient_id, spell_id)
+	FOREIGN KEY (spell_name) REFERENCES Spell (spell_name),
+	PRIMARY KEY (ingredient_id, spell_name)
 );
