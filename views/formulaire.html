@@ -213,21 +213,45 @@
 		</section>
 		
 		<section id="results-section" style="display: none;">
-			<table class="responsive-table">
-				<thead>
-					<tr>
-						<th>Name</th>
-						<th>School</th>
-						<th>Level</th>
-						<th>Components</th>
-						<th>Range</th>
-						<th>Spell Resistance</th>
-					</tr>
-				</thead>
-				<tbody id="spells-table">
-				
-				</tbody>
-			</table>
+			<ul id="tabs-swipe-demo" class="tabs">
+				<li class="tab col s3"><a class="active" href="#swipe-1">R&eacute;sultats MongoDB (Map-Reduce)</a></li>
+				<li class="tab col s3"><a href="#swipe-2">R&eacute;sultats SQLite (requete)</a></li>
+			</ul>
+
+			<div id="swipe-1">
+				<table class="responsive-table">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>School</th>
+							<th>Level</th>
+							<th>Components</th>
+							<th>Range</th>
+							<th>Spell Resistance</th>
+						</tr>
+					</thead>
+					<tbody id="spells-table-mongo">
+					
+					</tbody>
+				</table>
+			</div>
+			<div id="swipe-2">
+				<table class="responsive-table">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>School</th>
+							<th>Level</th>
+							<th>Components</th>
+							<th>Range</th>
+							<th>Spell Resistance</th>
+						</tr>
+					</thead>
+					<tbody id="spells-table-sqlite">
+					
+					</tbody>
+				</table>
+			</div>
 		</section>
 
 		<footer class="page-footer">
@@ -260,53 +284,70 @@
 		<script src="socket.io/socket.io.js"></script>
 		<script>
             var socket = io.connect("http://localhost:8080");
+			var mongodbReady = false;
+			var sqliteReady = true;
 			
-			socket.on('results', function(jsonObj) {
-				console.log(jsonObj);
-				// Disable loading screen
-				document.getElementById("preloader").style.display = "none";
-				var container = document.getElementById("results-section");
+			// Get the results container
+			var container = document.getElementById("results-section");
 			
-				// Change page style
-				var node = document.createElement('a');
-				var textnode = document.createTextNode("Resultats");
-				node.className += "breadcrumb";
-				node.appendChild(textnode);
-				document.getElementById("navigation-bar").appendChild(node);
-				
-				// Add results
-				for(var spell in jsonObj) {
-					console.log(jsonObj[spell]);
+			// Message handler
+			socket.on('results', function(message) {
+				if(message['bdd'] == 'sqlite') {
+					jsonObj = message['results'];
 					
-					var currentTR = document.createElement("tr");
-					//currentTR.setAttribute("id", "myTr");
-					document.getElementById("spells-table").appendChild(currentTR);
+					// TODO
 					
-					for (var key in jsonObj[spell]) {
-						if (jsonObj[spell].hasOwnProperty(key)) {
-							if(key == 'value') {
-								for (var val in jsonObj[spell][key]) {
-									console.log(val);
+					sqliteReady = true;
+				} else if(message['bdd'] == 'mongodb') {
+					jsonObj = message['results'];
+					console.log(jsonObj);
+					
+					// Add results
+					for(var spell in jsonObj) {
+						console.log(jsonObj[spell]);
+						
+						var currentTR = document.createElement("tr");
+						//currentTR.setAttribute("id", "myTr");
+						document.getElementById("spells-table-mongo").appendChild(currentTR);
+						
+						for (var key in jsonObj[spell]) {
+							if (jsonObj[spell].hasOwnProperty(key)) {
+								if(key == 'value') {
+									for (var val in jsonObj[spell][key]) {
+										console.log(val);
+										var currentTD = document.createElement("td");
+										var text = document.createTextNode(jsonObj[spell][key][val]);
+										currentTD.appendChild(text);
+										currentTR.appendChild(currentTD);
+									}
+								} else {
+									console.log(key + " -> " + jsonObj[spell][key]);
+									//container.innerHTML += key + " -> " + ;
+									
 									var currentTD = document.createElement("td");
-									var text = document.createTextNode(jsonObj[spell][key][val]);
+									var text = document.createTextNode(jsonObj[spell][key]);
 									currentTD.appendChild(text);
 									currentTR.appendChild(currentTD);
 								}
-							} else {
-								console.log(key + " -> " + jsonObj[spell][key]);
-								//container.innerHTML += key + " -> " + ;
-								
-								var currentTD = document.createElement("td");
-								var text = document.createTextNode(jsonObj[spell][key]);
-								currentTD.appendChild(text);
-								currentTR.appendChild(currentTD);
 							}
 						}
 					}
+					mongodbReady = true;
 				}
-			
-				container.style.display = "block";
-				
+				if(sqliteReady && mongodbReady) {
+					// Disable loading screen
+					document.getElementById("preloader").style.display = "none";
+					
+					// Change page style
+					var node = document.createElement('a');
+					var textnode = document.createTextNode("Resultats");
+					node.className += "breadcrumb";
+					node.appendChild(textnode);
+					document.getElementById("navigation-bar").appendChild(node);
+					
+					// Display results block
+					container.style.display = "block";
+				}
 			});
 			
 			$('#compute').click(function () {

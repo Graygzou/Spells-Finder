@@ -45,3 +45,7 @@ label > div {
 tr:nth-child(even) {
     background-color: #dddddd;
 }
+
+.tabs {
+	text-align: center;
+}
