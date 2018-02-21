@@ -95,11 +95,11 @@
 			</div>
 			<p>
 				<input type="checkbox" id="mongodb" disabled="disabled" />
-				<label for="test6">MongoDB status</label>
+				<label for="mongodb">MongoDB status</label>
 			</p>
 			<p>
 				<input type="checkbox" id="sqlite" disabled="disabled" />
-				<label for="test6">SQLite status</label>
+				<label for="sqlite">SQLite status</label>
 			</p>
 			
 			
@@ -110,7 +110,7 @@
             <div class="row">
               <div class="col l6 s12">
                 <h5 class="white-text">Objectifs</h5>
-                <p class="grey-text text-lighten-4">Ce site a &eacute;t&eacute; r&eacute;alis&eacute; dans le cadre d'un cours dispens&eacute; &agrave; l'UQAC. Ce site a donc &eacute;t&eacute; fait &agrave; des fins p&eacute;dagogiques.</p>
+                 <p class="grey-text text-lighten-4">Ce site a &eacute;t&eacute; r&eacute;alis&eacute; dans le cadre d'un cours dispens&eacute; &agrave; l'UQAC. Ce site a donc &eacute;t&eacute; fait &agrave; des fins p&eacute;dagogiques.</p>
               </div>
               <div class="col l4 offset-l2 s12">
                 <h5 class="white-text">Liens</h5>
@@ -142,10 +142,12 @@
 				console.log(message);
 				if(message['bdd'] == 'sqlite') {
 					sqliteReady = true;
-					document.getElementById("sqlite").prop( "checked" );
+					// Update the UI
+					$("#sqlite").prop('checked', true);
 				} else if(message['bdd'] == 'mongodb') {
 					mongodbReady = true;
-					document.getElementById("mongodbs").prop( "checked" );
+					// Update the UI
+					$("#mongodb").prop('checked', true);
 				}
 				if(sqliteReady && mongodbReady) {
 					window.location.href = "formulaire.html";

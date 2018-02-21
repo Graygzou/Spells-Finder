@@ -148,7 +148,7 @@ var insertSpell = function(jsondata, lastIDPages, endCallback) {
 					//console.log(jsondata['levels'][index]);
 					db.run("INSERT INTO Invoque (class_name, spell_name, spellLevel) VALUES (?, ?, ?)", 
 							[jsondata['levels'][index]['class'], jsondata['name'], jsondata['levels'][index]['level']], (err, row) => {
-						if (err) { console.log("spell failed insert query."); }
+						if (err) { console.log("invoque failed insert query."); }
 					});
 				}
 			});
