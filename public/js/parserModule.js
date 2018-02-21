@@ -1,6 +1,6 @@
 /**
  * @author : Grégoire Boiron <gregoire.boiron@gmail.com>
- * @version : 0.1.0
+ * @version : 0.1.2
  */
 
 /**
@@ -28,13 +28,28 @@ function splitLevel(level) {
 	levelJSON = {};
 	var levelsArray = level.split(', ');
 	tab = [];
-	for (var i = 0, len = levelsArray.length; i<len;i++ ) {
+	for (var i = 0, len = levelsArray.length; i<len; i++) {
 		var id = levelsArray[i].split(' ');
-		var json = {
-			'class': id[0],
-			'level': id[1]
-		};
-		tab[i] = json;
+		// Check if there is no mistakes
+		if(id.length == 2) {
+			// In the case we have multiple classes seperate by a '/'
+			if(id[0].indexOf('/') != -1) {
+				var classes = id[0].split('/');
+				for (var j = 0; j < classes.length; j++) {
+					var json = {
+						'class': classes[j],
+						'level': id[1]
+					};
+					tab.push(json);
+				}
+			} else {
+				var json = {
+					'class': id[0],
+					'level': id[1]
+				};
+				tab.push(json);
+			}
+		}
 	}
 	levelJSON["levels"] = tab;
 	return levelJSON;

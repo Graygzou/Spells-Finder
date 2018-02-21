@@ -9,6 +9,7 @@ var fs = require('fs');
 
 // Global variables used by the module
 var db;
+var counter = 0;
 
 /**
  * Basic setup of the sqlite bdd.
@@ -53,39 +54,64 @@ var initSpellsDB = function(endCallback) {
 	db.serialize(function() {
 		// Insert School values.
 		schools = [
-			{ name : 'Abjuration', 	desc : '' },
-			{ name : 'Conjuration', desc : '' },
-			{ name : 'Divination', 	desc : '' },
-			{ name : 'Enchantment', desc : '' },
-			{ name : 'Evocation', 	desc : '' },
-			{ name : 'Illusion', 	desc : '' },
-			{ name : 'Necromancy', 	desc : '' },
-			{ name : 'Transmutation', desc : '' }
+			{ name : 'abjuration', 	desc : '' },
+			{ name : 'conjuration', desc : '' },
+			{ name : 'divination', 	desc : '' },
+			{ name : 'enchantment', desc : '' },
+			{ name : 'evocation', 	desc : '' },
+			{ name : 'illusion', 	desc : '' },
+			{ name : 'necromancy', 	desc : '' },
+			{ name : 'sin magic specialist', 	desc : '' },
+			{ name : 'universal', 	desc : '' },
+			{ name : 'transmutation', desc : '' },
+			{ name : 'aether elemental school', desc : '' },
+			{ name : 'air', 	desc : '' },
+			{ name : 'earth', 	desc : '' },
+			{ name : 'fire', 	desc : '' },
+			{ name : 'water', 	desc : '' },
+			{ name : 'metal', 	desc : '' },
+			{ name : 'void', 	desc : '' },
+			{ name : 'wood', 	desc : '' }
+			
 		];
-		var insertQuery1 = db.prepare("INSERT INTO School VALUES (NULL, ?, ?)");
+		var insertIntoSchool = db.prepare("INSERT INTO School (school_name, description) VALUES (?, ?)");
 		for (var i = 0; i < schools.length; i++) {
-			insertQuery1.run([schools[i]['name'], schools[i]['desc']]);
+			insertIntoSchool.run([schools[i]['name'], schools[i]['desc']]);
 		}
-		insertQuery1.finalize();
+		insertIntoSchool.finalize();
 		// Insert Classes values.
 		classes = [
-			{ name : 'Bard', 	desc : '' },
-			{ name : 'Cleric', 	desc : '' },
-			{ name : 'Druid', 	desc : '' },
-			{ name : 'Fighter', desc : '' },
-			{ name : 'Monk', 	desc : '' },
-			{ name : 'Paladin', desc : '' },
-			{ name : 'Ranger', 	desc : '' },
-			{ name : 'Rogue', 	desc : '' },
-			{ name : 'Sorcerer', desc : '' },
-			{ name : 'Wizard', 	desc : '' }
+			{ name : 'antipaladin', desc : '' },
+			{ name : 'spiritualist', desc : '' },
+			{ name : 'psychic', 	desc : '' },
+			{ name : 'occultist', 	desc : '' },
+			{ name : 'mesmerist', 	desc : '' },
+			{ name : 'medium', 		desc : '' },
+			{ name : 'bloodrager', 	desc : '' },
+			{ name : 'shaman', 		desc : '' },
+			{ name : 'witch', 		desc : '' },
+			{ name : 'summoner', 	desc : '' },
+			{ name : 'inquisitor', 	desc : '' },
+			{ name : 'magus', 		desc : '' },
+			{ name : 'alchemist', 	desc : '' },
+			{ name : 'bard', 	desc : '' },
+			{ name : 'cleric', 	desc : '' },
+			{ name : 'oracle', 	desc : '' },
+			{ name : 'druid', 	desc : '' },
+			{ name : 'fighter', desc : '' },
+			{ name : 'monk', 	desc : '' },
+			{ name : 'paladin', desc : '' },
+			{ name : 'ranger', 	desc : '' },
+			{ name : 'rogue', 	desc : '' },
+			{ name : 'sorcerer', desc : '' },
+			{ name : 'wizard', 	desc : '' }
 		];
 		// Insert Class values.
-		var insertQuery2 = db.prepare("INSERT INTO UserClass VALUES (NULL, ?, ?)");
+		var insertIntoClass = db.prepare("INSERT INTO UserClass (class_name, description) VALUES (?, ?)");
 		for (var i = 0; i < classes.length; i++) {
-			insertQuery2.run([classes[i]['name'], classes[i]['desc']]);
+			insertIntoClass.run([classes[i]['name'], classes[i]['desc']]);
 		}
-		insertQuery2.finalize();
+		insertIntoClass.finalize();
 		endCallback();
 	});
 }
@@ -93,16 +119,98 @@ var initSpellsDB = function(endCallback) {
 /** Function that let insert in the database.
  * @param {object} jsondata - json file containing data.
  */
-var insertSpell = function(jsondata) {
-	// Call the parser maybe here ?
-	db.serialize(function() {
-		var stmt = db.prepare("INSERT INTO lorem VALUES (?)");
-		for (var i = 0; i < 10; i++) {
-			stmt.run("Ipsum " + i);
-		}
-		stmt.finalize();
+var insertSpell = function(jsondata, lastIDPages, endCallback) {
+	//console.log(jsondata);
 		
+		// First : Get the school id
+		/*var sql = "SELECT school_id id FROM School WHERE name = ?;";
+		db.get(sql, jsondata['school'], (err, school) => {
+			if (err) {
+				throw err;
+			}*/
+			// We insert the spell in his tables
+			//var insertSpell = db.prepare();
+			// Variables
+			console.log(jsondata['name']);
+			var isVerbose = hasComponent(jsondata['components'], 'V') ? '1' : '0';
+			var isSomatic = hasComponent(jsondata['components'], 'S') ? '1' : '0';
+			var provideResistance = jsondata['SpellResistance'].indexOf('yes') ? '1' : '0';
+			db.serialize(() => {
+				db.run("INSERT INTO Spell (school_name, description, provideResistance, isVerbose, isSomatic) VALUES (?, ?, ?, ?, ?)", 
+						[jsondata['name'], '', provideResistance, isVerbose, isSomatic], (err, row) => {
+					if (err) { console.log("spell failed insert query."); }
+					counter = counter + 1;
+					if(counter == lastIDPages) {
+						endCallback('sqlite');
+					}
+				});
+				for(index in jsondata['levels']) {
+					//console.log(jsondata['levels'][index]);
+					db.run("INSERT INTO Invoque (class_name, spell_name, spellLevel) VALUES (?, ?, ?)", 
+							[jsondata['levels'][index]['class'], jsondata['name'], jsondata['levels'][index]['level']], (err, row) => {
+						if (err) { console.log("spell failed insert query."); }
+					});
+				}
+			});
+				
+				/*
+				if(err) throw err;
+					
+				// Create the relation between Ingredients and Spell.
+				// TODO later ?
+					// Get his ID.
+					//var previousID = this.lastID;
+					var insertInvoque = db.prepare();
+					for(index in jsondata['levels']) {
+						console.log(jsondata['levels'][index]['class']);
+						// Create the relation between UserClass and Spell.
+						/*db.get("SELECT class_id id FROM UserClass WHERE name = ?", jsondata['levels'][index]['class'], (err, row) => {
+							if (err){
+								throw err;
+							}
+						insertInvoque.run("INSERT INTO Invoque (class_name, spell_name, spellLevel) VALUES (?, ?, ?)", [jsondata['levels'][index]['class'], jsondata['name'], jsondata['levels'][index]['level']]);
+						//});
+							
+						//console.log(jsondata['levels'][index]['class']);
+						//insertInvoque(sqlClassID, previousID, jsondata['levels'][index]);
+					}
+				
+			});*/
+			//insertSpell.finalize();
+		//});
+}
+
+/** Function that let insert in the database.
+ * @param {object} jsondata - json file containing data.
+ */
+ /*
+var insertInvoque = function(sqlClassID, previousID, currentField, endcallback()) {
+	console.log(previousID + " / ");
+	console.log(currentField);
+	sqlClassID.run(currentField['class'], (err, userClass) => {
+		if (err) {
+			throw err;
+		}
+		if(userClass === undefined) {
+			console.log("undefinied");
+			console.log(currentField);
+		}
+		var sqlInsertInvoque = db.prepare("INSERT INTO Invoque (class_id, spell_id, spellLevel) VALUES (?, ?, ?)");
+		sqlInsertInvoque.run([userClass.id, previousID, currentField['level']]);
+		sqlInsertInvoque.finalize();
 	});
+	sqlClassID.reset();
+}*/
+
+var hasComponent = function(components, wantedComponent) {
+	var find = false;
+	
+	for(index in components) {
+		if(components[index] == wantedComponent) {
+			find = true
+		}
+	}
+	return find;
 }
 
 

@@ -167,47 +167,47 @@ var reduceSpells = function(key, values){
 // Private functions
 // ----------------------------------------
 
-var checkComponents = function(currentSpellComponents, givenComponents) {
+var checkComponents = function(currentSpellInfos, givenSpellInfos) {
 	var equals = true;
-	for (key in givenComponents) {
+	for (key in givenSpellInfos) {
 		if(key == "levels") {
 			equals = false;
-			for (spellLevels in currentSpellComponents[key]) {
-				var spellClass = currentSpellComponents[key][spellLevels]["class"];
-				var spellLevel = currentSpellComponents[key][spellLevels]["level"];
+			for (spellLevels in currentSpellInfos[key]) {
+				var spellClass = currentSpellInfos[key][spellLevels]["class"];
+				var spellLevel = currentSpellInfos[key][spellLevels]["level"];
 				//printjson(spellClass);
-				if(spellClass.indexOf(givenComponents["levels"]["class"]) != -1 && spellLevel <= givenComponents["levels"]["level"]) {
+				if(spellClass.indexOf(givenSpellInfos["levels"]["class"]) > -1 && spellLevel <= givenSpellInfos["levels"]["level"]) {
 					equals = true;
 				}
 				
 			}
-		} 
-		//TODO
-		else if (key == "components") {
+		} else if (key == "components") {
 			equals = false;
-			for (components in currentSpellComponents[key] ) {
-				
+			if(currentSpellInfos[key].length == givenSpellInfos[key].length) {
+				for (currentIndex in currentSpellInfos[key] ) {
+					equals = equals && (givenSpellInfos[key][currentIndex].indexOf(currentSpellInfos[key][currentIndex]) > -1);
+				} 
+			} else {
+				equals = false;
 			}
-
-			
 		} else {
-			equals = equals && givenComponents[key] == currentSpellComponents[key];
+			equals = equals && givenSpellInfos[key] == currentSpellInfos[key];
 		}
 	}
 	
 	return equals;
 }
 
-var getSpellLevel = function(currentSpellLevels, givenComponents) {
+var getSpellLevel = function(currentSpellLevels, givenSpellInfos) {
 	var level;
 	print("ici");
-	printjson(givenComponents);
+	printjson(givenSpellInfos);
 	for (spellLevels in currentSpellLevels) {
 		printjson(spellLevels)
 		var spellClass = currentSpellLevels[spellLevels]["class"];
 		var spellLevel = currentSpellLevels[spellLevels]["level"];
-		if (givenComponents.hasOwnProperty("levels")) {
-			if(spellClass.indexOf(givenComponents["levels"]["class"])) {
+		if (givenSpellInfos.hasOwnProperty("levels")) {
+			if(spellClass.indexOf(givenSpellInfos["levels"]["class"])) {
 				level = spellLevel;
 			}
 		} else {

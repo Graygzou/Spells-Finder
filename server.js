@@ -110,18 +110,18 @@ io.sockets.on('connection', function (socket) {
 							console.log("-- Finished createCollection MongoDB --");
 							
 							// Start the crawling algorithm
-							startCrawler(message['url'], message['maxPage'], function () {
+							startCrawler(message['url'], message['maxPage'], function (result) {
 								
 								console.log("-- Finish crawling --");
 								
 								//getSpecificSpell();
 								
 								// close BDDs
-								mongodbModule.closeSpellsdb();
-								sqliteModule.closeSpellsDB();
+								//mongodbModule.closeSpellsdb();
+								//sqliteModule.closeSpellsDB();
 								
 								// Let know the client he can step over to the next page
-								socket.emit('finish', 'crawling');
+								socket.emit('finish', {'bdd': result});
 								
 							});
 						});
@@ -169,11 +169,11 @@ var startCrawler = function(url, maxPages, endCallback) {
 	}
 }
 
-var insertBDDsCallback = function(jsonData) {
+var insertBDDsCallback = function(jsonData, maxPages, endCallback) {
 	// Insert the json into MongoDB
 	mongodbModule.insertSpell(collecName, jsonData);
 	console.log("1 document inserted into MongoDB");
 	
 	// Insert into sqlite database
-	//sqliteModule.insertSpell(jsonData);
+	sqliteModule.insertSpell(jsonData, maxPages, endCallback);
 }

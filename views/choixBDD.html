@@ -54,6 +54,14 @@
 				<div class="field">
 					<label>
 						Base de donn&eacute;es disponibles
+						<div class="switch">
+							<label>
+							Off
+							<input id="school-switch" type="checkbox">
+							<span class="lever"></span>
+							On
+							</label>
+						</div>
 					</label>
 					<select id="bdd-value" class="browser-default">
 						<option value="1">http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=</option>
@@ -85,6 +93,16 @@
 					</div>
 				</div>
 			</div>
+			<p>
+				<input type="checkbox" id="mongodb" disabled="disabled" />
+				<label for="test6">MongoDB status</label>
+			</p>
+			<p>
+				<input type="checkbox" id="sqlite" disabled="disabled" />
+				<label for="test6">SQLite status</label>
+			</p>
+			
+			
 		</section>
 		
 		<footer class="page-footer">
@@ -117,19 +135,35 @@
 		<script src="socket.io/socket.io.js"></script>
 		<script>
             var socket = io.connect('http://localhost:8080');
+			var mongodbReady = false;
+			var sqliteReady = false;
 		
 			socket.on('finish', function(message) {
-				window.location.href = "formulaire.html";
+				console.log(message);
+				if(message['bdd'] == 'sqlite') {
+					sqliteReady = true;
+					document.getElementById("sqlite").prop( "checked" );
+				} else if(message['bdd'] == 'mongodb') {
+					mongodbReady = true;
+					document.getElementById("mongodbs").prop( "checked" );
+				}
+				if(sqliteReady && mongodbReady) {
+					window.location.href = "formulaire.html";
+				}
 			});
 
 			$('#next').click(function () {
-				document.getElementById("center-section").style.display = "none";
-				document.getElementById("preloader").style.display = "block";
-				
-				var url = $('#bdd-value option:selected').text().toLowerCase();
-				var maxPage = document.getElementById('page-value').value;
-				
-				socket.emit('get', { 'url' : url, 'maxPage' : maxPage});
+				if(document.getElementById('school-switch').checked == true) {
+					document.getElementById("center-section").style.display = "none";
+					document.getElementById("preloader").style.display = "block";
+					
+					var url = $('#bdd-value option:selected').text().toLowerCase();
+					var maxPage = document.getElementById('page-value').value;
+					
+					socket.emit('get', { 'url' : url, 'maxPage' : maxPage});
+				} else {
+					window.location.href = "formulaire.html";
+				}
 			});
         </script>
 	</body>

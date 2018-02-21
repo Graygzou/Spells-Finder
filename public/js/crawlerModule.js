@@ -47,7 +47,7 @@ var webScraper = function(url, numPage, dbcallback, lastIDPages, endCallback) {
 				var $ = res.$;
 				
 				// Parser
-				var spellTitle = $('div.heading').find('p').text();
+				var spellTitle = $('div.heading').find('p').first().text();
 
 				var infoSchoolLevel = $($('div.SpellDiv').children()[1]).text();
 				var school = parserModule.splitSchool(infoSchoolLevel.substring(7,infoSchoolLevel.indexOf(";")));
@@ -89,11 +89,11 @@ var webScraper = function(url, numPage, dbcallback, lastIDPages, endCallback) {
 				//console.log(currentSpell);
 		
 				// call MongoDB callback to insert the data into mongodb
-				dbcallback(currentSpell);
+				dbcallback(currentSpell, lastIDPages, endCallback);
 				
 				// Check if this is the last page
 				if (res.options.id == lastIDPages) {
-					endCallback();
+					endCallback('mongodb');
 				}
 					/*
 					spellsFinderDb.listCollections().toArray(function(err, collections){
