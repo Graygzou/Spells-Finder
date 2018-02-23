@@ -22,8 +22,7 @@ var setupSpellsDB = function(endCallback) {
 			return console.error(err.message);
 		}
 		console.log('Connected to the spell SQlite database.');
-		// Create the SQL schema.
-		createSpellsDB(endCallback);
+		endCallback();
 	});
 }
 
@@ -33,7 +32,7 @@ var setupSpellsDB = function(endCallback) {
 /**
  * 
  */
-var createSpellsDB = function(endCallback) {
+var resetSpellsDB = function(endCallback) {
 	// Retrieve the .sql file that create sqlite tables
 	//var createTableFile = fs.readFileSync('').toString();
 	
@@ -134,10 +133,11 @@ var insertSpell = function(jsondata, lastIDPages, endCallback) {
 			console.log(jsondata['name']);
 			var isVerbose = hasComponent(jsondata['components'], 'V') ? '1' : '0';
 			var isSomatic = hasComponent(jsondata['components'], 'S') ? '1' : '0';
-			var provideResistance = jsondata['SpellResistance'].indexOf('yes') ? '1' : '0';
+			var provideResistance = jsondata['SpellResistance'].indexOf('yes') > -1 ? '1' : '0';
+			
 			db.serialize(() => {
-				db.run("INSERT INTO Spell (school_name, description, provideResistance, isVerbose, isSomatic) VALUES (?, ?, ?, ?, ?)", 
-						[jsondata['name'], '', provideResistance, isVerbose, isSomatic], (err, row) => {
+				db.run("INSERT INTO Spell (spell_name, school_name, description, provideResistance, isVerbose, isSomatic) VALUES (?, ?, ?, ?, ?, ?)", 
+						[jsondata['name'], jsondata['school'], '', provideResistance, isVerbose, isSomatic], (err, row) => {
 					if (err) { console.log("spell failed insert query."); }
 					counter = counter + 1;
 					if(counter == lastIDPages) {
@@ -220,18 +220,96 @@ var hasComponent = function(components, wantedComponent) {
  * @param {bool} isVerbose - 1 is the spell needs verbose, 0 otherwise.
  * @param {bool} isSomatic - 1 is the spell needs somatic, 0 otherwise.
  * @param {bool} provideResistance - 1 if it grants spell resistance, 0 otherwise.
- * @param {array} materials - arrays of string that contains materials needed
  */
-var getSpecificSpell = function(Userclass, maxLevel, isVerbose, isSomatic, provideResistance, materials) {
-	var getQueryFile = fs.readFileSync('get-spell.sql').toString();
+var getSpecificSpells = function(params, endCallback) {
+	//var getQueryFile = fs.readFileSync('get-spell.sql').toString();
+	// Build the request depending on parameters
+	var sqlQueryFile = `SELECT * FROM Spell 
+	INNER JOIN Invoque on Invoque.spell_id = Spell.spell_id
+	INNER JOIN UserClass on UserClass.class_id = Invoque.class_id`;
+	
+	var queryParameters = [];
+	console.log(sqlQueryFile);
+	
+	/*
+	var sql = "SELECT * FROM Invoque";
+	db.all(sql, [], (err, rows) => {
+		if (err) {
+			throw err;
+		}
+		console.log(rows.length);
+		rows.forEach(function (row) {  
+			console.log(row);  
+		});
+	});*/
+	/*
+	var sql = "SELECT * FROM Invoque";
+	db.all(sql, [], (err, rows) => {
+		if (err) {
+			throw err;
+		}
+		console.log(rows.length);
+		rows.forEach(function (row) {  
+			console.log(row);  
+		});
+	});*/
+	
+	var sql = "SELECT DISTINCT Spell.spell_name, school_name, spellLevel, isVerbose, isSomatic, provideResistance FROM Spell INNER JOIN Invoque on Invoque.spell_name = Spell.spell_name";
+	// INNER JOIN UserClass on UserClass.class_name = Invoque.class_name
+	db.all(sql, [], (err, rows) => {
+		if (err) {
+			throw err;
+		}
+		console.log(rows.length);
+		rows.forEach(function (row) {  
+			console.log(row);  
+		});
+		endCallback({'bdd': 'sqlite', 'results': rows});
+	});
+	
+	/*
+	var i = 0;
+	for(index in params) {
+		elem = params[index];
+		console.log(elem)
+		if(i == 0) {
+			sqlQueryFile += 'WHERE';
+			i = 1;
+		} else {
+			sqlQueryFile += 'AND';
+		}
+		if(elem['type'] == 'userClass') {
+			sqlQueryFile += 'UserClass.class_name = ?';
+			// TODO queryParameters.push(elem['value']);
+			
+		} else if(elem['type'] == 'maxLevel') {
+			sqlQueryFile += 'Invoque.spellLevel = ?';
+			
+		} else if(elem['type'] == 'isVerbose') {
+			sqlQueryFile += 'Spell.isVerbal = ?';
+			
+		} else if(elem['type'] == 'isSomatic') {
+			sqlQueryFile += 'Spell.isSomatic = ?';
+			
+		} else if(elem['type'] == 'provideResistance') {
+			sqlQueryFile += 'Spell.provideResistance = ?';
+			
+		}
+	}
+	
+	sqlQueryFile += ';';
 	
 	db.serialize(function() {
-		db.each(getQueryFile, [Userclass, provideResistance, isVerbose, isSomatic], function(err, row) {
-			console.log(row.id + ": " + row.name);
+		db.all(sqlQueryFile, queryParameters, function(err, rows) {
+			console.log(rows);
+			rows.forEach(function (row) {  
+				console.log(row.first_name, row.last_name);  
+			});
+			//console.log(row.id + ": " + row.name);
 			// return the name of spells that match the request parameters
-			return row;
+			endCallback({'bdd': 'sqlite', 'results': row});
 		});
-	});
+	});*/
 }
 
 
@@ -249,8 +327,10 @@ var closeSpellsDB = function() {
 
 // Export module functions
 exports.setupSpellsDB 		= setupSpellsDB;
-exports.initSpellsDB		= initSpellsDB;
-exports.insertSpell 		= insertSpell;
-exports.getSpecificSpell 	= getSpecificSpell;
+exports.resetSpellsDB 		= resetSpellsDB;
 exports.closeSpellsDB 		= closeSpellsDB;
- 
+
+exports.initSpellsDB		= initSpellsDB;
+
+exports.insertSpell 		= insertSpell;
+exports.getSpecificSpells 	= getSpecificSpells;

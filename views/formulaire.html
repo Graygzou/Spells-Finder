@@ -222,6 +222,7 @@
 				<table class="responsive-table">
 					<thead>
 						<tr>
+							<th>Index</th>
 							<th>Name</th>
 							<th>School</th>
 							<th>Level</th>
@@ -239,11 +240,13 @@
 				<table class="responsive-table">
 					<thead>
 						<tr>
+							<th>Index</th>
 							<th>Name</th>
 							<th>School</th>
 							<th>Level</th>
-							<th>Components</th>
-							<th>Range</th>
+							<th>isVerbose</th>
+							<th>isSomatic</th>
+							<!--<th>Range</th>-->
 							<th>Spell Resistance</th>
 						</tr>
 					</thead>
@@ -295,13 +298,39 @@
 				if(message['bdd'] == 'sqlite') {
 					jsonObj = message['results'];
 					
-					// TODO
-					
+
+					var current_number = 1;
+					// Add results
+					for(index in jsonObj) {
+						console.log(jsonObj[index]);
+						
+						var currentTR = document.createElement("tr");
+						//currentTR.setAttribute("id", "myTr");
+						document.getElementById("spells-table-sqlite").appendChild(currentTR);
+						
+						// Add the index
+						var currentTD = document.createElement("td");
+						var text = document.createTextNode(current_number);
+						currentTD.appendChild(text);
+						currentTR.appendChild(currentTD);
+						
+						for (var key in jsonObj[index]) {
+							if (jsonObj[index].hasOwnProperty(key)) {
+								currentTD = document.createElement("td");
+								text = document.createTextNode(jsonObj[index][key]);
+								currentTD.appendChild(text);
+								currentTR.appendChild(currentTD);
+							}
+						}
+						current_number++;
+					}
+
 					sqliteReady = true;
 				} else if(message['bdd'] == 'mongodb') {
 					jsonObj = message['results'];
 					console.log(jsonObj);
 					
+					var current_number = 1;
 					// Add results
 					for(var spell in jsonObj) {
 						console.log(jsonObj[spell]);
@@ -310,13 +339,19 @@
 						//currentTR.setAttribute("id", "myTr");
 						document.getElementById("spells-table-mongo").appendChild(currentTR);
 						
+						// Add the index
+						var currentTD = document.createElement("td");
+						var text = document.createTextNode(current_number);
+						currentTD.appendChild(text);
+						currentTR.appendChild(currentTD);
+						
 						for (var key in jsonObj[spell]) {
 							if (jsonObj[spell].hasOwnProperty(key)) {
 								if(key == 'value') {
 									for (var val in jsonObj[spell][key]) {
 										console.log(val);
-										var currentTD = document.createElement("td");
-										var text = document.createTextNode(jsonObj[spell][key][val]);
+										currentTD = document.createElement("td");
+										text = document.createTextNode(jsonObj[spell][key][val]);
 										currentTD.appendChild(text);
 										currentTR.appendChild(currentTD);
 									}
@@ -324,13 +359,14 @@
 									console.log(key + " -> " + jsonObj[spell][key]);
 									//container.innerHTML += key + " -> " + ;
 									
-									var currentTD = document.createElement("td");
-									var text = document.createTextNode(jsonObj[spell][key]);
+									currentTD = document.createElement("td");
+									text = document.createTextNode(jsonObj[spell][key]);
 									currentTD.appendChild(text);
 									currentTR.appendChild(currentTD);
 								}
 							}
 						}
+						current_number++;
 					}
 					mongodbReady = true;
 				}

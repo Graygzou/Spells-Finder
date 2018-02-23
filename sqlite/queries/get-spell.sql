@@ -7,6 +7,7 @@ FROM Spell
 WHERE Spell.provideResistance = ?
 	AND	  Spell.isVerbal = ?
 	AND	  Spell.isSomatic = ?
-	AND	  UserClass.name = ?;
-	--AND   Ingredient
+	AND   UserClass.class_name = ?
+	AND	  Invoque.spellLevel <= ?;
+
 	

@@ -9,6 +9,7 @@ const assert = require('assert');
 
 var connect;
 var spellsFinderdb;
+var counter = 0;
 
 /** setupMongoDB
  * Basic setup of the mongodb database
@@ -63,10 +64,14 @@ var removeAllCollection = function(collecName, callback) {
  * @param {string} collecName - name of the collection
  * @param {object} jsondata - json file containing data.
  */
-var insertSpell = function(collecName, jsondata){
+var insertSpell = function(collecName, lastIDPages, jsondata, endCallback){
 	// Insert the current value in the database
 	spellsFinderdb.collection(collecName).insertOne(jsondata, function(err, res) {
 		if (err) throw err;
+		counter = counter + 1;
+		if(counter == lastIDPages) {
+			endCallback('mongodb');
+		}
 	});
 }
 
@@ -118,14 +123,14 @@ var mapReduceSpells = function(collecName, arguments, mapSpells, reduceSpells, c
 /**
  * Function that close the current database
  */
-var closeSpellsdb = function() {
+var closeSpellsDB = function() {
 	spellsFinderdb.close;
 }
 
 // Export module functions
 exports.setupMongoDB 		= setupMongoDB;
 exports.createCollections 	= createCollections
-exports.closeSpellsdb 		= closeSpellsdb; 
+exports.closeSpellsDB 		= closeSpellsDB; 
 
 exports.insertSpell 		= insertSpell;
 exports.removeAllCollection = removeAllCollection;

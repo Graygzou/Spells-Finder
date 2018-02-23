@@ -92,37 +92,45 @@ io.sockets.on('connection', function (socket) {
 		
 		// Setup MongoDB database
 		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
-			console.log("-- Finished setup MongoDB --");
+			console.log("MongoDB : -- Finished setup --");
 			
-			// Setup SQlite database
+			// Setup SQLite database
 			sqliteModule.setupSpellsDB( function () {
-				console.log("-- Finished setup sqlite --");
+				console.log("QSLite : -- Finished setup --");
 				
 				// Reset documents
 				mongodbModule.removeAllCollection(collecName, function () {
-					console.log("-- Finished removeAll MongoDB --");
+					console.log("MongoDB : -- Finished removeAll --");
+					
+					// Reset the SQLite db.
+					sqliteModule.resetSpellsDB( function () {
+						console.log("SQLite : -- Finished reset database --");
 				
-					// Initialise School and UserClass tables of SQlite database
-					sqliteModule.initSpellsDB(function () {
-						console.log("-- Finished initialize sqlite --");
-						
-						mongodbModule.createCollections(collecName, function () {
-							console.log("-- Finished createCollection MongoDB --");
+						// Initialise School and UserClass tables of SQlite database
+						sqliteModule.initSpellsDB(function () {
+							console.log("SQLite : -- Finished initialize --");
 							
-							// Start the crawling algorithm
-							startCrawler(message['url'], message['maxPage'], function (result) {
+							mongodbModule.createCollections(collecName, function () {
+								console.log("MongoDB : -- Finished createCollection --");
 								
-								console.log("-- Finish crawling --");
-								
-								//getSpecificSpell();
-								
-								// close BDDs
-								//mongodbModule.closeSpellsdb();
-								//sqliteModule.closeSpellsDB();
-								
-								// Let know the client he can step over to the next page
-								socket.emit('finish', {'bdd': result});
-								
+								// Start the crawling algorithm
+								startCrawler(message['url'], message['maxPage'], function (result) {
+									
+									console.log("-- Finish crawling --");
+									
+									//getSpecificSpell();
+									
+									// close BDDs
+									if(result == "sqlite") {
+										sqliteModule.closeSpellsDB();
+									} else if(result == "mongodb") {
+										mongodbModule.closeSpellsDB();
+									}
+									
+									// Let know the client he can step over to the next page
+									socket.emit('finish', {'bdd': result});
+									
+								});
 							});
 						});
 					});
@@ -139,8 +147,9 @@ io.sockets.on('connection', function (socket) {
 		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
 			console.log("-- Finished setup MongoDB --");
 			
-			mongodbModule.getAllDocuments(collecName, function (results) {
-
+			// Setup SQlite database
+			sqliteModule.setupSpellsDB( function () {
+				console.log("-- Finished setup sqlite --");
 				// Call the mapReduce function created for spells.
 				//var spellArgument = {school: 'conjuration', level: 2, components: ['V', 'S'], SpellResistance: 'no'};
 				
@@ -150,6 +159,14 @@ io.sockets.on('connection', function (socket) {
 					// Let know the client he can print the results
 					socket.emit('results', results);
 				});
+				
+				sqliteModule.getSpecificSpells(spellArgument, function (results) {
+					console.log(results);
+					// Let know the client he can print the results
+					socket.emit('results', results);
+					
+				});
+				
 			});
 		});
     });	
@@ -163,7 +180,7 @@ var startCrawler = function(url, maxPages, endCallback) {
 	
 	//var maxNumber = 1975;
 	//var maxNumber = 5;
-	//var url = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=";
+	var url = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=";
 	for(var id = 1; id <= maxPages; id++) {
 		crawlerModule.webScraper(url, id, insertBDDsCallback, maxPages, endCallback);
 	}
@@ -171,7 +188,7 @@ var startCrawler = function(url, maxPages, endCallback) {
 
 var insertBDDsCallback = function(jsonData, maxPages, endCallback) {
 	// Insert the json into MongoDB
-	mongodbModule.insertSpell(collecName, jsonData);
+	mongodbModule.insertSpell(collecName, maxPages, jsonData, endCallback);
 	console.log("1 document inserted into MongoDB");
 	
 	// Insert into sqlite database

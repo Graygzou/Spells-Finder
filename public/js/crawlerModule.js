@@ -46,78 +46,12 @@ var webScraper = function(url, numPage, dbcallback, lastIDPages, endCallback) {
 			} else {
 				var $ = res.$;
 				
-				// Parser
-				var spellTitle = $('div.heading').find('p').first().text();
+				// Send spell data to parse it.
+				var currentSpell = parserModule.parseCurrentSpell($('.SpellDiv'));
 
-				var infoSchoolLevel = $($('div.SpellDiv').children()[1]).text();
-				var school = parserModule.splitSchool(infoSchoolLevel.substring(7,infoSchoolLevel.indexOf(";")));
-				var level = parserModule.splitLevel(infoSchoolLevel.substring(infoSchoolLevel.indexOf(";")+8, infoSchoolLevel.length));
-
-				var castingTime = $($('div.SpellDiv').children()[3]).text().substring(13);
-				var components = parserModule.splitComponent($($('div.SpellDiv').children()[4]).text().substring(11));
-
-				var range = parserModule.splitRange($($('div.SpellDiv').children()[6]).text().substring(6));
-				var effects = $($('div.SpellDiv').children()[7]).text().substring(7);
-				var duration = $($('div.SpellDiv').children()[8]).text().substring(9);
-
-				var infoSavingResistance = $($('div.SpellDiv').children()[9]).text();
-				var savingThrow = infoSavingResistance.substring(13, infoSavingResistance.indexOf(";"));
-				var spellResistance = infoSavingResistance.substring(infoSavingResistance.indexOf(";")+19, infoSavingResistance.length);
-
-				var description = $($('div.SpellDiv').children()[11]).text();
-
-				/*
-				console.log(spellTitle)
-				console.log(school);
-				console.log(level);
-				console.log(components);
-				console.log(range);
-				console.log("SpellResistance :" + spellResistance);*/
-				
-				/*
-				console.log("Level            : " + level);
-				console.log("Casting Time     : " + castingTime);
-				console.log("Components       : " + components);
-				console.log("Range            : " + range);
-				console.log("Effects          : " + effects);
-				console.log("Duration         : " + duration);
-				console.log("Saving Throw     : " + savingThrow);
-				console.log("Spell Resistance : " + spellResistance);
-				console.log("Description      : " + description);*/
-				
-				var currentSpell = parserModule.JSONConcat({name: spellTitle}, [school, level, components, range, {SpellResistance: spellResistance}])
-				//console.log(currentSpell);
-		
 				// call MongoDB callback to insert the data into mongodb
 				dbcallback(currentSpell, lastIDPages, endCallback);
 				
-				// Check if this is the last page
-				if (res.options.id == lastIDPages) {
-					endCallback('mongodb');
-				}
-					/*
-					spellsFinderDb.listCollections().toArray(function(err, collections){
-						//collections = [{"name": "coll1"}, {"name": "coll2"}]
-						collections.forEach(function(elem) {
-							if (collecName === elem.name) {
-								spellsFinderDb.collection(collecName).drop();
-							}
-						});	
-					});*/
-
-				// $ is Cheerio by default
-				//a lean implementation of core jQuery designed specifically for the server
-				//console.log($('body').find('script').eq(7).text());
-
-				//console.log(infos.children());
-				//console.log($('.article-content').find('p').text());
-
-				//console.log($('.article_center').find('p'));
-				//console.log($('.article-content').find('p').length);
-				//fs.writeFileSync("monFichier", $('body').find('script').eq(7).text(), "UTF-8");
-				//console.log($("table").text());
-				//socket.emit('response', res.body);
-				//console.log($("title").text());
 			}
 			done();
 		}
