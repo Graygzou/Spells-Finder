@@ -154,14 +154,11 @@ io.sockets.on('connection', function (socket) {
 				//var spellArgument = {school: 'conjuration', level: 2, components: ['V', 'S'], SpellResistance: 'no'};
 				
 				mapReduceModule.findSpells(0, 1, dbUrl, dbName, collecName, spellArgument, function (results) {
-					//console.log(results);
-					
 					// Let know the client he can print the results
 					socket.emit('results', results);
 				});
 				
 				sqliteModule.getSpecificSpells(spellArgument, function (results) {
-					console.log(results);
 					// Let know the client he can print the results
 					socket.emit('results', results);
 					

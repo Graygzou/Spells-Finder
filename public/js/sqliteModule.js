@@ -224,92 +224,49 @@ var hasComponent = function(components, wantedComponent) {
 var getSpecificSpells = function(params, endCallback) {
 	//var getQueryFile = fs.readFileSync('get-spell.sql').toString();
 	// Build the request depending on parameters
-	var sqlQueryFile = `SELECT * FROM Spell 
-	INNER JOIN Invoque on Invoque.spell_id = Spell.spell_id
-	INNER JOIN UserClass on UserClass.class_id = Invoque.class_id`;
-	
 	var queryParameters = [];
-	console.log(sqlQueryFile);
+	console.log(params);
 	
-	/*
-	var sql = "SELECT * FROM Invoque";
-	db.all(sql, [], (err, rows) => {
-		if (err) {
-			throw err;
-		}
-		console.log(rows.length);
-		rows.forEach(function (row) {  
-			console.log(row);  
-		});
-	});*/
-	/*
-	var sql = "SELECT * FROM Invoque";
-	db.all(sql, [], (err, rows) => {
-		if (err) {
-			throw err;
-		}
-		console.log(rows.length);
-		rows.forEach(function (row) {  
-			console.log(row);  
-		});
-	});*/
+	var sql = "SELECT DISTINCT Spell.spell_name, Spell.school_name, spellLevel, isVerbose, isSomatic, provideResistance FROM Spell INNER JOIN Invoque on Invoque.spell_name = Spell.spell_name INNER JOIN School on School.school_name = Spell.school_name INNER JOIN UserClass on UserClass.class_name = Invoque.class_name";
 	
-	var sql = "SELECT DISTINCT Spell.spell_name, school_name, spellLevel, isVerbose, isSomatic, provideResistance FROM Spell INNER JOIN Invoque on Invoque.spell_name = Spell.spell_name";
-	// INNER JOIN UserClass on UserClass.class_name = Invoque.class_name
-	db.all(sql, [], (err, rows) => {
-		if (err) {
-			throw err;
-		}
-		console.log(rows.length);
-		rows.forEach(function (row) {  
-			console.log(row);  
-		});
-		endCallback({'bdd': 'sqlite', 'results': rows});
-	});
-	
-	/*
 	var i = 0;
 	for(index in params) {
-		elem = params[index];
-		console.log(elem)
 		if(i == 0) {
-			sqlQueryFile += 'WHERE';
+			sql += " WHERE ";
 			i = 1;
 		} else {
-			sqlQueryFile += 'AND';
+			sql += " AND ";
 		}
-		if(elem['type'] == 'userClass') {
-			sqlQueryFile += 'UserClass.class_name = ?';
-			// TODO queryParameters.push(elem['value']);
-			
-		} else if(elem['type'] == 'maxLevel') {
-			sqlQueryFile += 'Invoque.spellLevel = ?';
-			
-		} else if(elem['type'] == 'isVerbose') {
+		
+		if(index == 'school') {
+			sql += 'School.school_name = ?';
+			queryParameters.push(params[index]);
+		} else if(index == 'levels') {
+			sql += 'Invoque.spellLevel <= ?';
+			queryParameters.push(params[index]['level']);
+			sql += 'AND UserClass.class_name = ?';
+			queryParameters.push(params[index]['class']);
+		} else if(index == 'isVerbose') {
 			sqlQueryFile += 'Spell.isVerbal = ?';
+			// TODO
 			
-		} else if(elem['type'] == 'isSomatic') {
+		} else if(index == 'isSomatic') {
 			sqlQueryFile += 'Spell.isSomatic = ?';
+			// TODO
 			
-		} else if(elem['type'] == 'provideResistance') {
-			sqlQueryFile += 'Spell.provideResistance = ?';
-			
+		} else if(index == 'spellResistance') {
+			sql += "Spell.provideResistance = ?";
+			queryParameters.push(params[index].indexOf('yes') > -1 ? 1 : 0);
 		}
 	}
 	
-	sqlQueryFile += ';';
-	
-	db.serialize(function() {
-		db.all(sqlQueryFile, queryParameters, function(err, rows) {
-			console.log(rows);
-			rows.forEach(function (row) {  
-				console.log(row.first_name, row.last_name);  
-			});
-			//console.log(row.id + ": " + row.name);
-			// return the name of spells that match the request parameters
-			endCallback({'bdd': 'sqlite', 'results': row});
-		});
-	});*/
+	// Execute the query
+	db.all(sql, queryParameters, (err, rows) => {
+		if (err) {
+			throw err;
+		}
+		endCallback({'bdd': 'sqlite', 'results': rows});
+	});
 }
 
 
