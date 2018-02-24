@@ -36,8 +36,7 @@ CREATE TABLE IF NOT EXISTS School (
 );
 
 CREATE TABLE IF NOT EXISTS Ingredient (
-	ingredient_id INTEGER PRIMARY KEY,
-	name TEXT NOT NULL,
+	ingredient_name TEXT PRIMARY KEY,
 	description TEXT
 );
 
@@ -53,11 +52,11 @@ CREATE TABLE IF NOT EXISTS Invoque (
 );
 					
 CREATE TABLE IF NOT EXISTS Need (
-	indregient_type TEXT,
-	cost INTEGER,
-	ingredient_id INTEGER,
+	ingredient_name TEXT,
 	spell_name TEXT,
-	FOREIGN KEY (ingredient_id) REFERENCES Ingredients (ingredient_id),
+	ingredient_type TEXT,
+	cost INTEGER,
+	FOREIGN KEY (ingredient_name) REFERENCES Ingredients (ingredient_name),
 	FOREIGN KEY (spell_name) REFERENCES Spell (spell_name),
-	PRIMARY KEY (ingredient_id, spell_name)
+	PRIMARY KEY (ingredient_name, spell_name)
 );
