@@ -156,6 +156,9 @@ function splitLevel(level) {
 
 function splitComponent(components) {
 	var componentsJSON = {};
+	// First, remove useless parentheses and spaces.
+	var components = components.replace(/\(.*\)/g,'').replace(/ /g,'');
+	// then split
 	var componentsArray = components.split(', ');
 	var tab = [];
 	for (var i = 0, len = componentsArray.length; i<len;i++ ) {
@@ -164,8 +167,8 @@ function splitComponent(components) {
 		} else if (componentsArray[i].includes("DF")) {
 			tab[i]="DF";
 		} else {
-			// Remove useless parentheses and spaces.
-			tab[i]=componentsArray[i].replace(/\(.*\)/g,'').replace(/ /g,'');
+			// 
+			tab[i]=componentsArray[i];
 		}
 	}
 	componentsJSON["components"] = tab;

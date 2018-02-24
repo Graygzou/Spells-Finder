@@ -35,7 +35,7 @@
 			<div class="nav-wrapper">
 			  <div id="navigation-bar" class="col s12">
 				<a href="index.html" class="breadcrumb">Introduction</a>
-				<a href="#!" class="breadcrumb">Crit&egrave;res</a>
+				<a href="#!" onClick="window.location.reload()" class="breadcrumb">Crit&egrave;res</a>
 				<!--
 				<a href="#!" class="breadcrumb">Third</a>-->
 			  </div>
@@ -94,24 +94,24 @@
 					</label>
 					<div class="checkbox-div">
 						<p>
-							<input type="checkbox" id="verbal" />
-							<label for="verbal">Verbal (V)</label>
+							<input type="checkbox" class="components" id="V" />
+							<label for="V">Verbal (V)</label>
 						</p>
 						<p>
-							<input type="checkbox" id="somatic" />
-							<label for="somatic">Somatic (S)</label>
+							<input type="checkbox" class="components" id="S" />
+							<label for="S">Somatic (S)</label>
 						</p>
 						<p>
-							<input type="checkbox" id="material" />
-							<label for="material">Material (M)</label>
+							<input type="checkbox" class="components" id="M" />
+							<label for="M">Material (M)</label>
 						</p>
 						<p>
-							<input type="checkbox" id="focus"  />
-							<label for="focus">Focus (F)</label>
+							<input type="checkbox" class="components" id="F"  />
+							<label for="F">Focus (F)</label>
 						</p>
 						<p>
-							<input type="checkbox" id="divinefocus" />
-							<label for="divinefocus">Divine Focus (DF)</label>
+							<input type="checkbox" class="components" id="DF" />
+							<label for="DF">Divine Focus (DF)</label>
 						</p>
 					</div>
 				</div>
@@ -397,23 +397,43 @@
 						JSONdata = $.extend(JSONdata, {'school': $('#school-value option:selected').text().toLowerCase()});
 					}
 				}
+				// Retrieve components.
 				if(document.getElementById('components-switch').checked == true) {
-					JSONdata = $.extend(JSONdata, {'component': document.getElementById('components-value option:selected').text()});
+					componentsArray = [];
+					//JSONdata = $.extend(JSONdata, {'component': document.getElementById('components-value option:selected').text()});
+					var inputsComponent = $('input.components');
+					console.log(inputsComponent);
+					for(var i = 0; i < inputsComponent.length; i++) {
+						var jsonComp = {};
+						if(inputsComponent[i].checked == true) {
+							// Get the component of this checkbox
+							jsonComp[inputsComponent[i].id] = 1;
+							componentsArray.push(jsonComp);
+						} else {
+							// This allow to filter some spell by not checking the checkbox
+							jsonComp[inputsComponent[i].id] = 0;
+							componentsArray.push(jsonComp);
+						}
+					}
+					console.log(componentsArray);
+					JSONdata = $.extend(JSONdata, {'components': componentsArray});
 				}
 				if(document.getElementById('level-switch').checked == true) {
 					JSONdata = $.extend(JSONdata, { 'levels' : { 'class': $('#class-value option:selected').text().toLowerCase(), 'level' : document.getElementById('level-value').value}});
 				}
+				// Retrieve range.
 				if(document.getElementById('range-switch').checked == true) {
 					console.log($( "#range-value" ).val());
 					if($( "#range-value" ).val() != null) {
 						JSONdata = $.extend(JSONdata, {'range': $('#range-value option:selected').text().toLowerCase()});
 					}
 				}
+				// Retrieve spell resistance.
 				if(document.getElementById('resistance-switch').checked == true) {
 					if(document.getElementById('resistance-value').checked == true) {
-						JSONdata = $.extend(JSONdata, {'spellResistance': 'yes'});
+						JSONdata = $.extend(JSONdata, {'SpellResistance': 'yes'});
 					} else {
-						JSONdata = $.extend(JSONdata, {'spellResistance': 'no'});
+						JSONdata = $.extend(JSONdata, {'SpellResistance': 'no'});
 					}
 				}
 				console.log(JSONdata)

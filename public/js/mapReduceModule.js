@@ -110,14 +110,13 @@ var mapSpells = function() {
 	if(check(this, spellArguments)) {
 		// Find the level of the spell for the userClass
 		spellLevel = getSpellLevel(this.levels, spellArguments);
-		print(spellLevel);
 		// The current spell does match.
 		value = {
 			school: this.school,
 			level: spellLevel,
 			components: this.components,
 			range: this.range,
-			spellResistance: this.SpellResistance
+			SpellResistance: this.SpellResistance
 		};
 		emit(this.name, value);
 	} else {
@@ -175,22 +174,29 @@ var checkComponents = function(currentSpellInfos, givenSpellInfos) {
 			for (spellLevels in currentSpellInfos[key]) {
 				var spellClass = currentSpellInfos[key][spellLevels]["class"];
 				var spellLevel = currentSpellInfos[key][spellLevels]["level"];
-				//printjson(spellClass);
-				if(spellClass.indexOf(givenSpellInfos["levels"]["class"]) > -1 && spellLevel <= givenSpellInfos["levels"]["level"]) {
-					equals = true;
+				if(spellClass != undefined) {
+					if(spellClass.indexOf(givenSpellInfos["levels"]["class"]) > -1 && spellLevel <= givenSpellInfos["levels"]["level"]) {
+						equals = true;
+					}
 				}
-				
 			}
 		} else if (key == "components") {
-			equals = false;
-			if(currentSpellInfos[key].length == givenSpellInfos[key].length) {
-				for (currentIndex in currentSpellInfos[key] ) {
-					equals = equals && (givenSpellInfos[key][currentIndex].indexOf(currentSpellInfos[key][currentIndex]) > -1);
-				} 
-			} else {
-				equals = false;
+			// for all the spells
+			for(currentIndex in givenSpellInfos[key]) {
+				// get the current component ('V', 'S', ...)
+				current_component = givenSpellInfos[key][currentIndex];
+				for(key_comp in current_component) {
+					// See if it match
+					if(current_component[key_comp] == 1) {
+						equals = equals && (currentSpellInfos[key].indexOf(key_comp) > -1);
+					} else if(current_component[key_comp] == 0) {
+						equals = equals && (currentSpellInfos[key].indexOf(key_comp) == -1);
+					}
+				}
 			}
 		} else {
+			//print(givenSpellInfos[key]);
+			//print(currentSpellInfos[key]);
 			equals = equals && givenSpellInfos[key] == currentSpellInfos[key];
 		}
 	}
@@ -200,18 +206,28 @@ var checkComponents = function(currentSpellInfos, givenSpellInfos) {
 
 var getSpellLevel = function(currentSpellLevels, givenSpellInfos) {
 	var level;
-	print("ici");
-	printjson(givenSpellInfos);
-	for (spellLevels in currentSpellLevels) {
-		printjson(spellLevels)
-		var spellClass = currentSpellLevels[spellLevels]["class"];
-		var spellLevel = currentSpellLevels[spellLevels]["level"];
-		if (givenSpellInfos.hasOwnProperty("levels")) {
-			if(spellClass.indexOf(givenSpellInfos["levels"]["class"])) {
-				level = spellLevel;
+	//print("ici");
+	//printjson(givenSpellInfos);
+	//printjson(currentSpellLevels);
+	for(var i = 0; i < currentSpellLevels.length; i++)
+	{
+	//for (spellLevels in currentSpellLevels) {
+		//print(spellLevels);
+		// assign the first level no matter what
+		if(i == 0) {
+			level = currentSpellLevels[i]["level"];
+		}
+		var spellClass = currentSpellLevels[i]["class"];
+		var spellLevel = currentSpellLevels[i]["level"];
+		//print(spellClass);
+		if(spellClass != undefined) {
+			if (givenSpellInfos.hasOwnProperty("levels")) {
+				if(spellClass.indexOf(givenSpellInfos["levels"]["class"])) {
+					level = spellLevel;
+				}
+			} else {
+				 level = spellLevel;
 			}
-		} else {
-			 return spellLevel;
 		}
 	}
 	

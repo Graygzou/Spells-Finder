@@ -246,15 +246,45 @@ var getSpecificSpells = function(params, endCallback) {
 			queryParameters.push(params[index]['level']);
 			sql += 'AND UserClass.class_name = ?';
 			queryParameters.push(params[index]['class']);
-		} else if(index == 'isVerbose') {
-			sqlQueryFile += 'Spell.isVerbal = ?';
-			// TODO
+		} else if(index == 'components') {
+			var firstOne = true;
+			var queryFilter = '';
 			
-		} else if(index == 'isSomatic') {
-			sqlQueryFile += 'Spell.isSomatic = ?';
-			// TODO
-			
-		} else if(index == 'spellResistance') {
+			// For all components in the array
+			for(var compIndex in params[index]) {
+				console.log(params[index][compIndex]);
+				// to get the key
+				for(var key in params[index][compIndex]) {
+					console.log(key)
+					console.log(params[index][compIndex][key])
+					// find out which component is it.
+					switch(key) {
+						case 'V':
+							queryFilter = 'Spell.isVerbose = ?';
+							break;
+						case 'S':
+							queryFilter = 'Spell.isSomatic = ?';
+							break;
+							/*
+						case 'M':
+							break;
+						case 'F': TODO
+							break;
+						case 'DF':
+							break;*/
+						default:
+							continue;
+					}
+					if(firstOne) {
+						firstOne = false;
+						sql += queryFilter;
+					} else {
+						sql += " AND " + queryFilter;
+					}
+					queryParameters.push(params[index][compIndex][key]);
+				}
+			}
+		} else if(index == 'SpellResistance') {
 			sql += "Spell.provideResistance = ?";
 			queryParameters.push(params[index].indexOf('yes') > -1 ? 1 : 0);
 		}

@@ -41,7 +41,7 @@ const collecName = 'spells';				// Collection name
 // -------------------------------------
 
 // Index page
-app.get('/', function(req, res) {
+app.get(['/','/index.html'], function(req, res) {
     res.setHeader('Content-Type', 'text/plain');
 	fs.readFile('./views/index.html', 'utf-8', function(error, content) {
         res.writeHead(200, {"Content-Type": "text/html"});
@@ -145,11 +145,11 @@ io.sockets.on('connection', function (socket) {
 		
 		// Setup MongoDB database
 		mongodbModule.setupMongoDB(dbUrl, dbName, collecName, function () {
-			console.log("-- Finished setup MongoDB --");
+			console.log("MongoDB : -- Finished setup --");
 			
 			// Setup SQlite database
 			sqliteModule.setupSpellsDB( function () {
-				console.log("-- Finished setup sqlite --");
+				console.log("SQLite : -- Finished setup --");
 				// Call the mapReduce function created for spells.
 				//var spellArgument = {school: 'conjuration', level: 2, components: ['V', 'S'], SpellResistance: 'no'};
 				
