@@ -40,6 +40,7 @@ var parseCurrentSpell = function(divSpell) {
 						// Remove the first space
 						finalSpell.CastingTime = value;
 					case "components":
+						console.log(value);
 						finalSpell = JSONConcat(finalSpell, [splitComponent(value)]);
 						break;
 					case "range":
@@ -75,7 +76,7 @@ var parseCurrentSpell = function(divSpell) {
 	// Fill the empty fields with dummy value.
 	finalSpell = checkSpell(finalSpell);
 	
-	//console.log(finalSpell);
+	console.log(finalSpell);
 	
 	// Return the final JSON of the spell
 	return finalSpell;
@@ -159,15 +160,14 @@ function splitComponent(components) {
 	// First, remove useless parentheses and spaces.
 	var components = components.replace(/\(.*\)/g,'').replace(/ /g,'');
 	// then split
-	var componentsArray = components.split(', ');
+	var componentsArray = components.split(',');
 	var tab = [];
-	for (var i = 0, len = componentsArray.length; i<len;i++ ) {
+	for (var i = 0, len = componentsArray.length; i<len; i++) {
 		if (componentsArray[i].includes("M/DF")){
 			tab[i]="M/DF";
 		} else if (componentsArray[i].includes("DF")) {
 			tab[i]="DF";
 		} else {
-			// 
 			tab[i]=componentsArray[i];
 		}
 	}

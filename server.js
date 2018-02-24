@@ -174,10 +174,7 @@ io.sockets.on('connection', function (socket) {
 // -------------------------------------	
 
 var startCrawler = function(url, maxPages, endCallback) {
-	
-	//var maxNumber = 1975;
-	//var maxNumber = 5;
-	var url = "http://www.dxcontent.com/SDB_SpellBlock.asp?SDBID=";
+	// Start looping over id to crawl all the pages.
 	for(var id = 1; id <= maxPages; id++) {
 		crawlerModule.webScraper(url, id, insertBDDsCallback, maxPages, endCallback);
 	}
