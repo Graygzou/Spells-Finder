@@ -24,12 +24,28 @@
 		  <div class="nav-wrapper padding-left">
 			<a href="" class="brand-logo">Spell Finder - Match the perfect spell</a>
 			<ul id="nav-mobile" class="right hide-on-med-and-down">
-			  <li><a href="">A propos</a></li>
-			  <!--<li><a href="">sass <span class="new badge">4</span></a></li>
-			  <li><a href="">sass</a></li>-->
+				<!-- Modal Trigger -->
+				<li><a class="waves-effect waves-light modal-trigger" href="#modal1">A propos</a></li>
 			</ul>
 		  </div>
 		</nav>
+		
+  <div id="modal1" class="modal modal-fixed-footer">
+    <div class="modal-content">
+      <h4>A propos</h4>
+      <h5>Authors</h5>
+	  <p>
+		<ul>
+			<li>Gr&eacute;goire Boiron</li>
+			<li>Florian Vidal</li>
+			<li>Th&eacute;o Le Donne</li>
+		</ul>
+	  </p>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Ok</a>
+    </div>
+  </div>
 		
 		<nav class="padding-left">
 			<div class="nav-wrapper">
@@ -41,6 +57,7 @@
 			  </div>
 			</div>
 		</nav>
+		
 		
 		<section id="center-section">
 			<h1>Criteres</h1>
@@ -289,6 +306,12 @@
             var socket = io.connect("http://localhost:8080");
 			var mongodbReady = false;
 			var sqliteReady = true;
+			
+			// Activate the modal dialogbox
+			$(document).ready(function(){
+				// the "href" attribute of the modal trigger must specify the modal ID that wants to be triggered
+				$('.modal').modal();
+			});
 			
 			// Get the results container
 			var container = document.getElementById("results-section");

@@ -290,6 +290,8 @@ var getSpecificSpells = function(params, endCallback) {
 		}
 	}
 	
+	sql += "ORDER BY Spell.spell_name;";
+	
 	// Execute the query
 	db.all(sql, queryParameters, (err, rows) => {
 		if (err) {

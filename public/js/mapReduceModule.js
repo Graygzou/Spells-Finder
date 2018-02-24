@@ -69,7 +69,7 @@ function findSpells(i, max, dbUrl, dbName, collecName, arguments, endCallback){
 			return (true);
 		}*/
 	
-		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, checkComponents, getSpellLevel, function (result) {
+		mongodbModule.mapReduceSpells(collecName, spellArguments, mapSpells, reduceSpells, checkInformations, getSpellLevel, function (result) {
 			console.log("-- MapReduce finished --");
 			endCallback(result);
 		});
@@ -166,7 +166,7 @@ var reduceSpells = function(key, values){
 // Private functions
 // ----------------------------------------
 
-var checkComponents = function(currentSpellInfos, givenSpellInfos) {
+var checkInformations = function(currentSpellInfos, givenSpellInfos) {
 	var equals = true;
 	for (key in givenSpellInfos) {
 		if(key == "levels") {
@@ -181,6 +181,7 @@ var checkComponents = function(currentSpellInfos, givenSpellInfos) {
 				}
 			}
 		} else if (key == "components") {
+			var counter = 0;
 			// for all the spells
 			for(currentIndex in givenSpellInfos[key]) {
 				// get the current component ('V', 'S', ...)
@@ -188,15 +189,18 @@ var checkComponents = function(currentSpellInfos, givenSpellInfos) {
 				for(key_comp in current_component) {
 					// See if it match
 					if(current_component[key_comp] == 1) {
+						counter += 1;
 						equals = equals && (currentSpellInfos[key].indexOf(key_comp) > -1);
 					} else if(current_component[key_comp] == 0) {
 						equals = equals && (currentSpellInfos[key].indexOf(key_comp) == -1);
 					}
 				}
 			}
+			// Make a final filter to make sure we take into account M/DF and F/DF components.
+			if(currentSpellInfos[key].length != counter) {
+				equals = false;
+			}
 		} else {
-			//print(givenSpellInfos[key]);
-			//print(currentSpellInfos[key]);
 			equals = equals && givenSpellInfos[key] == currentSpellInfos[key];
 		}
 	}
