@@ -1,13 +1,21 @@
-SELECT * 
-FROM Spell
-	INNER JOIN Invoque 		on Invoque.spell_id = Spell.spell_id
-	INNER JOIN UserClass 	on UserClass.class_id = Invoque.class_id
-	--INNER JOIN Need 		on Need.spell_id = Spell.spell_id
-	--INNER JOIN Ingredient 	on Ingredient.ingredient_id = Need.ingredient_id;
-WHERE Spell.provideResistance = ?
-	AND	  Spell.isVerbal = ?
-	AND	  Spell.isSomatic = ?
-	AND   UserClass.class_name = ?
-	AND	  Invoque.spellLevel <= ?;
-
-	
+SELECT DISTINCT sp1.spell_name,
+         sp1.school_name,
+         spellLevel,
+         isVerbose,
+         isSomatic,
+         provideResistance
+FROM Spell AS sp1
+INNER JOIN Invoque
+    ON Invoque.spell_name = sp1.spell_name
+INNER JOIN School
+    ON School.school_name = sp1.school_name
+INNER JOIN UserClass
+    ON UserClass.class_name = Invoque.class_name
+WHERE 0 = 
+    (SELECT count(*)
+    FROM Ingredients AS ing
+    INNER JOIN Need
+        ON Need.ingredient_name = ing.ingredient_name
+    INNER JOIN Spell
+        ON Spell.spell_name = Need.spell_name
+    WHERE Spell.spell_name = sp1.spell_name)

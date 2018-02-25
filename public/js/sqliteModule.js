@@ -134,6 +134,11 @@ var insertSpell = function(jsondata, lastIDPages, endCallback) {
 			var isVerbose = hasComponent(jsondata['components'], 'V') ? '1' : '0';
 			var isSomatic = hasComponent(jsondata['components'], 'S') ? '1' : '0';
 			var provideResistance = jsondata['SpellResistance'].indexOf('yes') > -1 ? '1' : '0';
+			// ----
+			var hasFocus = hasComponent(jsondata['components'], 'F') ? '1' : '0';
+			var hasMaterials = hasComponent(jsondata['components'], 'M') ? '1' : '0';
+			var hasMorDF = hasComponent(jsondata['components'], 'M/DF') ? '1' : '0';
+			var hasDivineFocus = hasComponent(jsondata['components'], 'DF') ? '1' : '0';
 			
 			db.serialize(() => {
 				db.run("INSERT INTO Spell (spell_name, school_name, description, provideResistance, isVerbose, isSomatic) VALUES (?, ?, ?, ?, ?, ?)", 
@@ -144,10 +149,67 @@ var insertSpell = function(jsondata, lastIDPages, endCallback) {
 						endCallback('sqlite');
 					}
 				});
+				// Add extras data into the database
 				for(index in jsondata['levels']) {
 					//console.log(jsondata['levels'][index]);
 					db.run("INSERT INTO Invoque (class_name, spell_name, spellLevel) VALUES (?, ?, ?)", 
 							[jsondata['levels'][index]['class'], jsondata['name'], jsondata['levels'][index]['level']], (err, row) => {
+						if (err) { console.log("invoque failed insert query."); }
+					});
+				}
+				if(hasMaterials) {
+					// Insert the "ingredients"
+					var id_mat = Math.random().toString(36).substring(7);
+					// Right now it's a dummy value because we don't retrieve objects in parentheses.
+					db.run("INSERT INTO Ingredient (ingredient_name, description) VALUES (?, ?)", 
+							[id_mat, 'dummy value'], (err, row) => {
+						if (err) { console.log("invoque failed insert query."); }
+					});
+					// Insert the link between the two tables
+					db.run("INSERT INTO Need (ingredient_name, spell_name, ingredient_type, cost) VALUES (?, ?, ?, ?)", 
+							[id_mat, jsondata['name'], 'M', 0.0], (err, row) => {
+						if (err) { console.log("invoque failed insert query."); }
+					});
+				}
+				if(hasMorDF) {
+					// Insert the "ingredients"
+					var id_mat = Math.random().toString(36).substring(7);
+					// Right now it's a dummy value because we don't retrieve objects in parentheses.
+					db.run("INSERT INTO Ingredient (ingredient_name, description) VALUES (?, ?)", 
+							[id_mat, 'dummy value'], (err, row) => {
+						if (err) { console.log("invoque failed insert query."); }
+					});
+					// Insert the link between the two tables
+					db.run("INSERT INTO Need (ingredient_name, spell_name, ingredient_type, cost) VALUES (?, ?, ?, ?)", 
+							[id_mat, jsondata['name'], 'M/DF', 0.0], (err, row) => {
+						if (err) { console.log("invoque failed insert query."); }
+					});
+				}
+				if(hasDivineFocus) {
+					// Insert the "ingredients"
+					var id_mat = Math.random().toString(36).substring(7);
+					// Right now it's a dummy value because we don't retrieve objects in parentheses.
+					db.run("INSERT INTO Ingredient (ingredient_name, description) VALUES (?, ?)", 
+							[id_mat, 'dummy value'], (err, row) => {
+						if (err) { console.log("invoque failed insert query."); }
+					});
+					// Insert the link between the two tables
+					db.run("INSERT INTO Need (ingredient_name, spell_name, ingredient_type, cost) VALUES (?, ?, ?, ?)", 
+							[id_mat, jsondata['name'], 'DF', 0.0], (err, row) => {
+						if (err) { console.log("invoque failed insert query."); }
+					});
+				}
+				if(hasFocus) {
+					// Insert the "ingredients"
+					var id_mat = Math.random().toString(36).substring(7);
+					// Right now it's a dummy value because we don't retrieve objects in parentheses.
+					db.run("INSERT INTO Ingredient (ingredient_name, description) VALUES (?, ?)", 
+							[id_mat, 'dummy value'], (err, row) => {
+						if (err) { console.log("invoque failed insert query."); }
+					});
+					// Insert the link between the two tables
+					db.run("INSERT INTO Need (ingredient_name, spell_name, ingredient_type, cost) VALUES (?, ?, ?, ?)", 
+							[id_mat, jsondata['name'], 'F', 0.0], (err, row) => {
 						if (err) { console.log("invoque failed insert query."); }
 					});
 				}
@@ -227,16 +289,10 @@ var getSpecificSpells = function(params, endCallback) {
 	var queryParameters = [];
 	console.log(params);
 	
-	var sql = "SELECT DISTINCT Spell.spell_name, Spell.school_name, spellLevel, isVerbose, isSomatic, provideResistance FROM Spell INNER JOIN Invoque on Invoque.spell_name = Spell.spell_name INNER JOIN School on School.school_name = Spell.school_name INNER JOIN UserClass on UserClass.class_name = Invoque.class_name";
+	var sql = fs.readFileSync('./sqlite/queries/get-spell.sql').toString();
 	
-	var i = 0;
 	for(index in params) {
-		if(i == 0) {
-			sql += " WHERE ";
-			i = 1;
-		} else {
-			sql += " AND ";
-		}
+		sql += " AND ";
 		
 		if(index == 'school') {
 			sql += 'School.school_name = ?';
@@ -268,7 +324,7 @@ var getSpecificSpells = function(params, endCallback) {
 							/*
 						case 'M':
 							break;
-						case 'F': TODO
+						case 'F': TODO Later
 							break;
 						case 'DF':
 							break;*/
