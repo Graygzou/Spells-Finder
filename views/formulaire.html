@@ -16,9 +16,6 @@
 	  <!-- Include stylesheets -->
 	  <link rel="stylesheet" type="text/css" href="css/main-style.css">	
     </head>
-	
-	<!-- https://docs.google.com/spreadsheets/d/1cuwb3QSvWDD7GG5McdvyyRBpqycYuKMRsXgyrvxvLFI/htmlembed -->
-
     <body>
 		<nav>
 		  <div class="nav-wrapper padding-left">
@@ -311,7 +308,7 @@
 		<script>
             var socket = io.connect("http://localhost:8080");
 			var mongodbReady = false;
-			var sqliteReady = true;
+			var sqliteReady = false;
 			
 			// Activate the modal dialogbox
 			$(document).ready(function(){

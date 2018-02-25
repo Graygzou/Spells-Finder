@@ -167,19 +167,20 @@ var reduceSpells = function(key, values){
 // ----------------------------------------
 
 var checkInformations = function(currentSpellInfos, givenSpellInfos) {
-	var equals = true;
+	var finalEquals = true;
 	for (key in givenSpellInfos) {
 		if(key == "levels") {
-			equals = false;
+			var innerEquals = false;
 			for (spellLevels in currentSpellInfos[key]) {
 				var spellClass = currentSpellInfos[key][spellLevels]["class"];
 				var spellLevel = currentSpellInfos[key][spellLevels]["level"];
 				if(spellClass != undefined) {
 					if(spellClass.indexOf(givenSpellInfos["levels"]["class"]) > -1 && spellLevel <= givenSpellInfos["levels"]["level"]) {
-						equals = true;
+						innerEquals = true;
 					}
 				}
 			}
+			finalEquals = finalEquals && innerEquals;
 		} else if (key == "components") {
 			var counter = 0;
 			// for all the spells
@@ -190,22 +191,24 @@ var checkInformations = function(currentSpellInfos, givenSpellInfos) {
 					// See if it match
 					if(current_component[key_comp] == 1) {
 						counter += 1;
-						equals = equals && (currentSpellInfos[key].indexOf(key_comp) > -1);
+						finalEquals = finalEquals && (currentSpellInfos[key].indexOf(key_comp) > -1);
 					} else if(current_component[key_comp] == 0) {
-						equals = equals && (currentSpellInfos[key].indexOf(key_comp) == -1);
+						finalEquals = finalEquals && (currentSpellInfos[key].indexOf(key_comp) == -1);
 					}
 				}
 			}
 			// Make a final filter to make sure we take into account M/DF and F/DF components.
 			if(currentSpellInfos[key].length != counter) {
-				equals = false;
+				finalEquals = false;
 			}
 		} else {
-			equals = equals && givenSpellInfos[key] == currentSpellInfos[key];
+			printjson(givenSpellInfos[key]);
+			printjson(currentSpellInfos[key]);
+			finalEquals = finalEquals && (givenSpellInfos[key] == currentSpellInfos[key]);
 		}
 	}
 	
-	return equals;
+	return finalEquals;
 }
 
 var getSpellLevel = function(currentSpellLevels, givenSpellInfos) {

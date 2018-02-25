@@ -1,3 +1,8 @@
+/*
+ * @author : Grégoire Boiron <gregoire.boiron@gmail.com>
+ * @version : 0.1.0
+ */
+
 SELECT DISTINCT sp1.spell_name,
          sp1.school_name,
          Invoque.spellLevel,
@@ -19,11 +24,3 @@ WHERE 0 =
     INNER JOIN Spell AS sp2
         ON sp2.spell_name = n1.spell_name
     WHERE sp2.spell_name = sp1.spell_name)
-	
-/*
-SELECT DISTINCT sp1.spell_name, n1.ingredient_type
-FROM Spell AS sp1
-INNER JOIN Need AS n1
-	ON n1.spell_name = sp1.spell_name
-INNER JOIN Ingredient AS ing1
-	ON ing1.ingredient_name = n1.ingredient_name*/

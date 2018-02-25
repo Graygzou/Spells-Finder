@@ -1,3 +1,8 @@
+/*
+ * @author : Grégoire Boiron <gregoire.boiron@gmail.com>
+ * @version : 0.1.0
+ */
+
 -------------------------------------
 -- Create basic tables
 -------------------------------------
