@@ -30,7 +30,6 @@ var parseCurrentSpell = function(divSpell) {
 				value = child.next.data.substring(1);
 				switch(libelle) {
 					case "school":
-						console.log(child.next.data)
 						finalSpell = JSONConcat(finalSpell, [splitSchool(value)]);
 						break;
 					case "level":
@@ -40,7 +39,6 @@ var parseCurrentSpell = function(divSpell) {
 						// Remove the first space
 						finalSpell.CastingTime = value;
 					case "components":
-						console.log(value);
 						finalSpell = JSONConcat(finalSpell, [splitComponent(value)]);
 						break;
 					case "range":
@@ -76,17 +74,18 @@ var parseCurrentSpell = function(divSpell) {
 	// Fill the empty fields with dummy value.
 	finalSpell = checkSpell(finalSpell);
 	
-	console.log(finalSpell);
+	// DEBUG : console.log(finalSpell);
 	
 	// Return the final JSON of the spell
 	return finalSpell;
 }
 
+// Export module functions
+exports.parseCurrentSpell = parseCurrentSpell;
 
-// -------------------------------------------
+// ---------------------------------------------------------------
 // PRIVATE FUNCTIONS
-// -------------------------------------------
-
+// ---------------------------------------------------------------
 
 function checkSpell(finalSpell) {
 	var fields = ["name", "school", "subschool", "descriptor", "levels", "CastingTime",
@@ -183,23 +182,6 @@ function splitRange(range) {
 }
 
 /**
- * TODO later
- */
- /*
-function splitComponents(components) {
-	var arr = components.split(",").map(function (val) {
-		materials = '';
-		if(var val.indexOf('M') > -1) {
-			// Retrieve materials for the spell
-			var materials = splitParenthesis(val, "and|plus");
-		}
-		return val + ": " + materials + 1;
-	});
-	
-	return arr
-}*/
-
-/**
  * Allow to merge properties of many JSON objects into one.
  * @param {object} mainValue - JSON object that will contains all the properties.
  * @param {array<object>} properties - JSON objects with properties.
@@ -213,10 +195,6 @@ function JSONConcat(mainValue, properties) {
 	});
 	return mainValue;
 }
-
-// ---------------------------------------------------------------
-// PRIVATE FUNCTIONS
-// ---------------------------------------------------------------
 
 /**
  * 
@@ -234,6 +212,3 @@ function splitContainer(line, leftContainer, rightContainer, regexp) {
 	}
 	return objects;
 }
-
-// Export module functions
-exports.parseCurrentSpell = parseCurrentSpell;

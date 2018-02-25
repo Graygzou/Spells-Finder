@@ -113,7 +113,7 @@ var mapReduceSpells = function(collecName, arguments, mapSpells, reduceSpells, c
 	.then(function (collection) {
 		collection.find({}).toArray().then(function (docs) {
 		   // Send the result to the callback
-		   console.log(docs);
+		   // DEBUG : console.log(docs);
 		   callback({'bdd': 'mongodb', 'results': docs});
 	   });
 	});
