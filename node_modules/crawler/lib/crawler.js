@@ -43,7 +43,7 @@ function readJqueryUrl (url, callback) {
 }
 
 function contentType(res){
-    return get(res,'content-type');
+    return get(res,'content-type').split(';').filter(item => item.trim().length !== 0).join(';');
 }
 
 function get(res,field){
@@ -357,6 +357,7 @@ Crawler.prototype._onContent = function _onContent (error, options, response) {
 	    (options.uri||options.url)+(options.retries?' ('+options.retries+' retries left)':''));
 	
         if (options.retries) {
+            self.options.skipDuplicates = false;
             setTimeout(function() {
                 options.retries--;
 		self.queue(options);
